@@ -3,6 +3,56 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Dirigentes Solares </h1>
+    <p>**No último sábado de cada mês realizamos o testemunho no comércio. </p>
 </div>
+
+@using FilaDeCampo.Models
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Início";
+
+    int mes = ViewData["Mes"] as int? ?? DateTime.Now.Month;
+    int ano = ViewData["Ano"] as int? ?? DateTime.Now.Year;
+    var escalas = ViewData["Escalas"] as List<EscalaDeSabado> ?? new();
+
+    var nomeMes = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mes);
+}
+
+<h2>Escala de @nomeMes / @ano</h2>
+
+@if (!escalas.Any())
+{
+    <p><strong>Nenhuma escala gerada para este mês.</strong></p>
+
+
+}
+else
+{
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Sábado</th>
+                <th>Dirigente</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in escalas)
+        {
+            <tr>
+                <td>@item.Data.ToString("dd/MM/yyyy")</td>
+                <td>@item.Data.ToString("dddd")</td>
+                <td>@item.Dirigente?.Nome</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <br />
+
+    <a asp-controller="Escala" asp-action="Index">
+        Ver escala completa
+    </a>
+}

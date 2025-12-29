@@ -1,0 +1,17 @@
+@model FilaDeCampo.Models.Dirigente
+
+<h2>Novo Dirigente</h2>
+
+<form asp-action="Criar" method="post">
+
+    <div>
+        <label>Nome do dirigente</label><br />
+        <input asp-for="Nome" />
+    </div>
+
+    <br />
+
+    <button type="submit">Salvar</button>
+    <a asp-action="Index">Voltar</a>
+
+</form>

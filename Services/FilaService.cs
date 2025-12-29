@@ -6,12 +6,11 @@ namespace FilaDeCampo.Services;
 
 public class FilaService
 {
-    private readonly DbSolaresCampo _context;
-    public FilaService(DbSolaresCampo context)
+    private readonly DbSolaresCampo _dbSolares;
+    public FilaService(DbSolaresCampo dbsolares)
     {
-        _context = context;
+        _dbSolares = dbsolares;
     }
-
     public List<EscalaDeSabado> GerarFila(
         int mes,
         int ano,
@@ -32,7 +31,6 @@ public class FilaService
             data = data.AddDays(1);
         }
 
-        // garante ordem do rodízio
         var ordenados = dirigentes
             .Where(d => d.Ativo)
             .OrderBy(d => d.OrdemRodizio)
@@ -63,7 +61,7 @@ public class FilaService
 
     public async Task CriarEscalaAsync(int mes, int ano)
     {
-        var dirigentes = await _context.Dirigentes
+        var dirigentes = await _dbSolares.Dirigentes
             .Where(d => d.Ativo)
             .OrderBy(d => d.OrdemRodizio)
             .ToListAsync();
@@ -71,7 +69,7 @@ public class FilaService
         if (!dirigentes.Any())
             throw new Exception("Nenhum dirigente ativo cadastrado.");
 
-        var config = await _context.Configuracoes.FirstAsync();
+        var config = await _dbSolares.Configuracoes.FirstAsync();
 
         var escalas = GerarFila(
             mes,
@@ -82,15 +80,15 @@ public class FilaService
 
         foreach (var escala in escalas)
         {
-            bool jaExiste = await _context.Escalas
+            bool jaExiste = await _dbSolares.Escalas
                 .AnyAsync(e => e.Data == escala.Data);
 
             if (!jaExiste)
-                _context.Escalas.Add(escala);
+                _dbSolares.Escalas.Add(escala);
 
             config.UltimoDirigenteId = escala.DirigenteId;
         }
 
-        await _context.SaveChangesAsync();
+        await _dbSolares.SaveChangesAsync();
     }
 }
