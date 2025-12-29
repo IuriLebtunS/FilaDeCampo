@@ -1,16 +1,23 @@
+using FilaDeCampo.Data;
 using FilaDeCampo.Models;
-using System.Collections.Generic;
-using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilaDeCampo.Services;
 
 public class FilaService
 {
+    private readonly DbSolaresCampo _context;
+    public FilaService(DbSolaresCampo context)
+    {
+        _context = context;
+    }
+
     public List<EscalaDeSabado> GerarFila(
         int mes,
         int ano,
         List<Dirigente> dirigentes,
         int ultimoDirigenteId)
+
     {
         var resultado = new List<EscalaDeSabado>();
 
@@ -52,5 +59,38 @@ public class FilaService
         }
 
         return resultado;
+    }
+
+    public async Task CriarEscalaAsync(int mes, int ano)
+    {
+        var dirigentes = await _context.Dirigentes
+            .Where(d => d.Ativo)
+            .OrderBy(d => d.OrdemRodizio)
+            .ToListAsync();
+
+        if (!dirigentes.Any())
+            throw new Exception("Nenhum dirigente ativo cadastrado.");
+
+        var config = await _context.Configuracoes.FirstAsync();
+
+        var escalas = GerarFila(
+            mes,
+            ano,
+            dirigentes,
+            config.UltimoDirigenteId
+        );
+
+        foreach (var escala in escalas)
+        {
+            bool jaExiste = await _context.Escalas
+                .AnyAsync(e => e.Data == escala.Data);
+
+            if (!jaExiste)
+                _context.Escalas.Add(escala);
+
+            config.UltimoDirigenteId = escala.DirigenteId;
+        }
+
+        await _context.SaveChangesAsync();
     }
 }
