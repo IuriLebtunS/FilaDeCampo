@@ -1,7 +1,17 @@
+using FilaDeCampo.Services;
+using FilaDeCampo.Data;
+using Microsoft.EntityFrameworkCore;
+using FilaDeCampo.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<FilaService>();
+
+builder.Services.AddDbContext<DbSolaresCampo>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
