@@ -1,0 +1,66 @@
+@using FilaDeCampo.Models
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Escala de Sábados";
+
+   int mes = ViewData["Mes"] as int? ?? DateTime.Now.Month;
+   int ano = ViewData["Ano"] as int? ?? DateTime.Now.Year;
+   
+    var escalas = ViewData["Escalas"] as List<EscalaDeSabado>;
+
+    var meses = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames;
+}
+
+<h2>Escala de Sábados</h2>
+
+<form method="get" asp-action="Index">
+    <label>Mês:</label>
+    <select name="mes">
+        @for (int i = 1; i <= 12; i++)
+        {
+            <option value="@i" selected="@(i == mes)">
+                @meses[i - 1]
+            </option>
+        }
+    </select>
+
+    <label>Ano:</label>
+    <input type="number" name="ano" value="@ano" style="width:80px" />
+
+    <button type="submit">Buscar</button>
+    <a asp-action="Criar" class="btn">Gerar escala do mês</a>
+</form>
+
+<hr />
+
+@if (escalas == null || !escalas.Any())
+{
+    <p><strong>Nenhuma escala encontrada para este mês.</strong></p>
+}
+else
+{
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Sábado</th>
+                <th>Dirigente</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in escalas)
+            {
+                <tr>
+                    <td>@item.Data.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Data.ToString("dddd")</td>
+                    <td>@item.Dirigente?.Nome</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@item.Id">Editar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

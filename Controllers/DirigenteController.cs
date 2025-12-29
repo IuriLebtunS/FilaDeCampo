@@ -1,7 +1,7 @@
-using FilaDeCampo.Data;
-using FilaDeCampo.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using FilaDeCampo.Models;
+using FilaDeCampo.Data;
 
 namespace FilaDeCampo.Controllers;
 
@@ -36,6 +36,12 @@ public class DirigenteController : Controller
         if (!ModelState.IsValid)
             return View(dirigente);
 
+        int ultimo = await _dbSolares.Dirigentes
+            .MaxAsync(d => (int?)d.OrdemRodizio) ?? 0;
+
+        dirigente.OrdemRodizio = ultimo + 1;
+        dirigente.Ativo = true;
+
         _dbSolares.Dirigentes.Add(dirigente);
         await _dbSolares.SaveChangesAsync();
 
@@ -63,4 +69,4 @@ public class DirigenteController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-}   
+}

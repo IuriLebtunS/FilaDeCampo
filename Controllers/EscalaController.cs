@@ -33,7 +33,7 @@ public class EscalaController : Controller
         return View();
     }
 
-      public async Task<IActionResult> Detalhes(int id)
+    public async Task<IActionResult> Detalhes(int id)
     {
         var escala = await _dbSolares.Escalas
             .Include(e => e.Dirigente)
@@ -45,32 +45,55 @@ public class EscalaController : Controller
         return View(escala);
     }
 
-  
-    public async Task<IActionResult> Criar()
-    {
-         ViewData["Dirigentes"] = await _dbSolares.Dirigentes
-            .Where(d => d.Ativo)
-            .OrderBy(d => d.Nome)
-            .ToListAsync();
 
+    public IActionResult Criar()
+    {
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Criar(EscalaDeSabado escala)
+    public async Task<IActionResult> Criar(int mes, int ano)
     {
-        if (ModelState.IsValid)
-        {
-            _dbSolares.Add(escala);
-            await _dbSolares.SaveChangesAsync();
+        var dirigentes = await _dbSolares.Dirigentes
+            .Where(d => d.Ativo)
+            .OrderBy(d => d.OrdemRodizio)
+            .ToListAsync();
+
+        if (!dirigentes.Any())
             return RedirectToAction(nameof(Index));
+
+        var data = new DateTime(ano, mes, 1);
+        var sabados = new List<DateTime>();
+
+        while (data.Month == mes)
+        {
+            if (data.DayOfWeek == DayOfWeek.Saturday)
+                sabados.Add(data);
+
+            data = data.AddDays(1);
         }
 
-        ViewData["Dirigentes"] = await _dbSolares.Dirigentes.ToListAsync();
-        return View(escala);
-    }
+        int index = 0;
 
+        foreach (var sabado in sabados)
+        {
+            var dirigente = dirigentes[index % dirigentes.Count];
+
+            _dbSolares.Escalas.Add(new EscalaDeSabado
+            {
+                Data = sabado,
+                DirigenteId = dirigente.Id
+            });
+
+            index++;
+        }
+
+        await _dbSolares.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index), new { mes, ano });
+    }
+    
     public async Task<IActionResult> Editar(int id)
     {
         var escala = await _dbSolares.Escalas.FindAsync(id);
