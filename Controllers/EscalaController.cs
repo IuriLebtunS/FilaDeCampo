@@ -8,11 +8,11 @@ namespace FilaDeCampo.Controllers;
 
 public class EscalaController : Controller
 {
-    private readonly DbSolaresCampo _context;
+    private readonly DbSolaresCampo _dbSolares;
 
-    public EscalaController(DbSolaresCampo context)
+    public EscalaController(DbSolaresCampo dbsolares)
     {
-        _context = context;
+        _dbSolares = dbsolares;
     }
 
     public async Task<IActionResult> Index(int? mes, int? ano)
@@ -20,7 +20,7 @@ public class EscalaController : Controller
         int mesAtual = mes ?? DateTime.Now.Month;
         int anoAtual = ano ?? DateTime.Now.Year;
 
-        var escalas = await _context.Escalas
+        var escalas = await _dbSolares.Escalas
             .Include(e => e.Dirigente)
             .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual)
             .OrderBy(e => e.Data)
@@ -35,7 +35,7 @@ public class EscalaController : Controller
 
       public async Task<IActionResult> Detalhes(int id)
     {
-        var escala = await _context.Escalas
+        var escala = await _dbSolares.Escalas
             .Include(e => e.Dirigente)
             .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -45,10 +45,10 @@ public class EscalaController : Controller
         return View(escala);
     }
 
-    // CREATE (GET)
+  
     public async Task<IActionResult> Criar()
     {
-        ViewData["Dirigentes"] = await _context.Dirigentes
+         ViewData["Dirigentes"] = await _dbSolares.Dirigentes
             .Where(d => d.Ativo)
             .OrderBy(d => d.Nome)
             .ToListAsync();
@@ -56,28 +56,28 @@ public class EscalaController : Controller
         return View();
     }
 
-    // CREATE (POST)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(EscalaDeSabado escala)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(escala);
-            await _context.SaveChangesAsync();
+            _dbSolares.Add(escala);
+            await _dbSolares.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Dirigentes"] = await _context.Dirigentes.ToListAsync();
+        ViewData["Dirigentes"] = await _dbSolares.Dirigentes.ToListAsync();
         return View(escala);
     }
+
     public async Task<IActionResult> Editar(int id)
     {
-        var escala = await _context.Escalas.FindAsync(id);
+        var escala = await _dbSolares.Escalas.FindAsync(id);
         if (escala == null)
             return NotFound();
 
-        ViewData["Dirigentes"] = await _context.Dirigentes
+        ViewData["Dirigentes"] = await _dbSolares.Dirigentes
             .Where(d => d.Ativo)
             .OrderBy(d => d.Nome)
             .ToListAsync();
@@ -89,17 +89,14 @@ public class EscalaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(int id, EscalaDeSabado escala)
     {
-        if (id != escala.Id)
-            return NotFound();
-
         if (ModelState.IsValid)
         {
-            _context.Update(escala);
-            await _context.SaveChangesAsync();
+            _dbSolares.Update(escala);
+            await _dbSolares.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Dirigentes"] = await _context.Dirigentes.ToListAsync();
+        ViewData["Dirigentes"] = await _dbSolares.Dirigentes.ToListAsync();
         return View(escala);
     }
 }

@@ -1,7 +1,6 @@
 using FilaDeCampo.Services;
 using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
-using FilaDeCampo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
