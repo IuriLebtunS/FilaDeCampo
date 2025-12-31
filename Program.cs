@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<FilaService>();
+
 // DB CONTEXT
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
     options.UseSqlServer(
@@ -28,7 +29,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Escala}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

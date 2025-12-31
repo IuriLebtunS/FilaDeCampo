@@ -1,0 +1,65 @@
+@model FilaDeCampo.ViewModels.EscalaDetalheVM
+
+@{
+    ViewData["Title"] = "Escala de Sábados";
+}
+
+<div class="d-flex align-items-center mb-3">
+
+    <h2 class="mb-0">
+        <i class="fa-solid fa-calendar-days me-2"></i>
+        @ViewData["Title"] – @Model.Mes/@Model.Ano
+    </h2>
+
+    <div class="ms-auto d-flex gap-2">
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Voltar
+        </a>
+
+        <a asp-action="ExportarExcel" asp-route-mes="@Model.Mes" asp-route-ano="@Model.Ano"
+            class="btn btn-outline-success">
+            <i class="fa-solid fa-file-excel me-1"></i>
+            Excel
+        </a>
+
+
+    </div>
+
+</div>
+
+<hr />
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-primary text-white">
+        <i class="fa-solid fa-list-check me-1"></i>
+        Sábados do mês
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        @foreach (var item in Model.Sabados)
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+
+                <div>
+                    <strong>@item.Data.ToString("dd/MM/yyyy")</strong>
+                    <span class="text-muted ms-2">
+                        (@item.Data.ToString("dddd"))
+                    </span>
+                </div>
+
+                <a asp-controller="Dirigente" asp-action="Editar" asp-route-id="@item.DirigenteId"
+                    class="badge bg-primary fs-6 text-decoration-none">
+                    <i class="fa-solid fa-user-tie me-1"></i>
+                    @item.Dirigente
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>

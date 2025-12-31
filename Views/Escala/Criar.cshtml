@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Criar Escala";
+
+    int mesAtual = DateTime.Now.Month;
+    int anoAtual = DateTime.Now.Year;
+}
+
+<h2>Criar Escala</h2>
+
+<form asp-action="Criar" method="post">
+
+    <div class="mb-3">
+        <label>Mês inicial</label>
+        <input type="text"class="form-control"value="@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mesAtual) @anoAtual"readonly />
+        <input type="hidden" name="mes" value="@mesAtual" />
+        <input type="hidden" name="ano" value="@anoAtual" />
+    </div>
+
+    <div class="mb-3">
+        <label>Quantidade de meses</label>
+        <input type="number"name="quantidadeMeses"class="form-control"value="1"min="1"max="3" />
+        <small class="text-muted">
+            A escala será criada para o mês atual e os meses seguintes.
+        </small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Criar Escala
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        voltar
+    </a>
+
+</form>

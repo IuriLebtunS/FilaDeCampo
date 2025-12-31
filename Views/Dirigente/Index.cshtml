@@ -1,0 +1,51 @@
+@model List<FilaDeCampo.Models.Dirigente>
+
+@{
+    ViewData["Title"] = "Dirigentes";
+}
+
+<div class="d-flex align-items-center mb-3">
+
+    <h1 class="mb-0">
+        <i class="fa-solid fa-users me-2"></i>
+        @ViewData["Title"]
+    </h1>
+
+    <div class="ms-auto">
+        <a asp-action="Criar" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-1"></i>
+            Novo Dirigente
+        </a>
+    </div>
+
+</div>
+
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-secondary">
+        Nenhum dirigente cadastrado ainda.
+    </div>
+}
+else
+{
+    <div class="list-group">
+
+        @foreach (var dirigente in Model)
+        {
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               asp-action="Editar"
+               asp-route-id="@dirigente.Id">
+
+                <span>
+                    <strong>@dirigente.OrdemRodizio</strong> —
+                    @dirigente.Nome
+                </span>
+
+                <i class="fa-solid fa-chevron-right text-muted"></i>
+            </a>
+        }
+
+    </div>
+}

@@ -232,3 +232,6 @@ C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\refint\FilaDeCampo.dll
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\FilaDeCampo.pdb
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\FilaDeCampo.genruntimeconfig.cache
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\ref\FilaDeCampo.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\X.PagedList.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\X.PagedList.Mvc.Core.dll
+C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\FilaDeCampo.MvcApplicationPartsAssemblyInfo.cs

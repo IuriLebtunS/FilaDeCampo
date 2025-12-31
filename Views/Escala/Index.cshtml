@@ -1,66 +1,52 @@
-@using FilaDeCampo.Models
+@model X.PagedList.IPagedList<FilaDeCampo.ViewModels.EscalaMesVM>
 @using System.Globalization
+@using X.PagedList.Mvc.Core
 
 @{
-    ViewData["Title"] = "Escala de Sábados";
-
-   int mes = ViewData["Mes"] as int? ?? DateTime.Now.Month;
-   int ano = ViewData["Ano"] as int? ?? DateTime.Now.Year;
-   
-    var escalas = ViewData["Escalas"] as List<EscalaDeSabado>;
-
-    var meses = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames;
+    ViewData["Title"] = "Dirigentes de Campo Sabados";
 }
 
-<h2>Escala de Sábados</h2>
+<div class="d-flex justify-content-between align-items-center">
+    <h2>
+        <i class="fa-solid fa-business-time"></i>
+        @ViewData["Title"]
+    </h2>
 
-<form method="get" asp-action="Index">
-    <label>Mês:</label>
-    <select name="mes">
-        @for (int i = 1; i <= 12; i++)
-        {
-            <option value="@i" selected="@(i == mes)">
-                @meses[i - 1]
-            </option>
-        }
-    </select>
-
-    <label>Ano:</label>
-    <input type="number" name="ano" value="@ano" style="width:80px" />
-
-    <button type="submit">Buscar</button>
-    <a asp-action="Criar" class="btn">Gerar escala do mês</a>
-</form>
+    <a asp-action="Criar" class="btn btn-primary">
+        Criar Escala
+    </a>
+</div>
 
 <hr />
 
-@if (escalas == null || !escalas.Any())
+@if (!Model.Any())
 {
-    <p><strong>Nenhuma escala encontrada para este mês.</strong></p>
+    <p><strong>Nenhuma escala criada ainda.</strong></p>
 }
 else
 {
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Sábado</th>
-                <th>Dirigente</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in escalas)
-            {
-                <tr>
-                    <td>@item.Data.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Data.ToString("dddd")</td>
-                    <td>@item.Dirigente?.Nome</td>
-                    <td>
-                        <a asp-action="Editar" asp-route-id="@item.Id">Editar</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <ul class="list-group">
+        @foreach (FilaDeCampo.ViewModels.EscalaMesVM item in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Mes)
+                    / @item.Ano
+                </span>
+
+                <a asp-action="Detalhes"
+                   asp-route-mes="@item.Mes"
+                   asp-route-ano="@item.Ano"
+                   class="btn btn-sm btn-outline-primary">
+                    Ver Detalhes
+                </a>
+            </li>
+        }
+    </ul>
+
+    <br />
+
+    @Html.PagedListPager(Model, page =>
+        Url.Action("Index", new { page })
+    )
 }

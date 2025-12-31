@@ -1,0 +1,46 @@
+@model FilaDeCampo.Models.Dirigente
+
+@{
+    ViewData["Title"] = "Editar Dirigente";
+}
+
+<h2 class="mb-4">
+    <i class="fa-solid fa-user-pen me-2"></i>
+    @ViewData["Title"]
+</h2>
+
+<form asp-action="Editar" method="post">
+
+    @* Campo oculto para o Id *@
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label">Nome do dirigente</label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    @* Se existir no modelo *@
+    @* 
+    <div class="mb-3">
+        <label asp-for="OrdemRodizio" class="form-label">Ordem no rodízio</label>
+        <input asp-for="OrdemRodizio" type="number" class="form-control" />
+        <span asp-validation-for="OrdemRodizio" class="text-danger"></span>
+    </div>
+    *@
+
+    <div class="d-flex justify-content-end mt-4">
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-primary ms-2">
+            <i class="fa-regular fa-circle-check me-1"></i>
+            Salvar Alterações
+        </button>
+
+    </div>
+
+</form>
