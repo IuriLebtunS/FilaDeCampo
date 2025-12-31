@@ -1,42 +1,42 @@
-📅 Sistema de Escala de Dirigentes de Campo – Congregação Solares
-📌 Descrição
+# 📅 Sistema de Escala de Dirigentes de Campo  
+**Congregação Solares**
 
-Aplicação web desenvolvida para automatizar a geração e o gerenciamento da escala mensal dos dirigentes de campo aos sábados da Congregação Solares.
+## 📌 Sobre o Projeto
 
-O sistema substitui o processo manual feito em planilhas Excel, trazendo maior controle, padronização e facilidade de manutenção.
+A Congregação Solares enfrenta dificuldades para organizar, mensalmente, as escalas dos **dirigentes de campo dos sábados** utilizando planilhas em Excel.  
+O processo manual acaba sendo trabalhoso, sujeito a erros e difícil de manter quando ocorrem mudanças.
 
-🎯 Objetivos Técnicos
+Este projeto foi desenvolvido para **automatizar e organizar** esse processo, oferecendo uma solução simples, centralizada e fácil de manter.
 
-Centralizar o controle das escalas mensais
+---
 
-Automatizar o rodízio de dirigentes
+## 🎯 Objetivo
 
-Permitir edição pontual por data
+- Organizar a escala mensal dos sábados
+- Facilitar a visualização dos dirigentes de cada dia
+- Permitir ajustes rápidos quando necessário
+- Exportar a escala para **Excel ou Word**
+- Eliminar o uso de planilhas manuais
 
-Gerar relatórios exportáveis (Excel/Word)
+---
 
-Manter histórico organizado
+## ✅ Funcionalidades
 
-🧩 Funcionalidades
+- Cadastro de dirigentes de campo
+- Geração automática da escala mensal
+- Visualização detalhada por mês e ano
+- Edição do dirigente por data específica
+- Exportação da escala (Excel)
+- Interface simples e responsiva
 
-CRUD de dirigentes
+---
 
-Geração de escala mensal filtrada por mês e ano
+## 🛠️ Tecnologias Utilizadas
 
-Visualização detalhada por sábado
+- **ASP.NET Core MVC**
+- **Entity Framework Core**
+- **SQL Server**
+- **Bootstrap / Bootswatch**
+- **Font Awesome**
 
-Edição de dirigente por data
 
-Exportação da escala
-
-Interface responsiva
-
-🏗️ Stack Tecnológica
-
-Backend: ASP.NET Core MVC
-
-ORM: Entity Framework Core
-
-Banco de Dados: SQL Server
-
-Frontend: Razor Views, Bootstrap, Font Awesome
