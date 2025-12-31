@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<FilaService>();
+
 // DB CONTEXT
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
     options.UseSqlServer(

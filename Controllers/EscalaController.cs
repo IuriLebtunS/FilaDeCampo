@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using FilaDeCampo.Models;
 using FilaDeCampo.Data;
-
+using FilaDeCampo.ViewModels;
+using X.PagedList.Extensions;
 
 namespace FilaDeCampo.Controllers;
 
@@ -15,88 +16,137 @@ public class EscalaController : Controller
         _dbSolares = dbsolares;
     }
 
-    public async Task<IActionResult> Index(int? mes, int? ano)
-    {
-        int mesAtual = mes ?? DateTime.Now.Month;
-        int anoAtual = ano ?? DateTime.Now.Year;
 
-        var escalas = await _dbSolares.Escalas
-            .Include(e => e.Dirigente)
-            .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual)
-            .OrderBy(e => e.Data)
+    public async Task<IActionResult> Index(int page = 1)
+    {
+        const int pageSize = 10;
+
+        var mesesQuery = _dbSolares.Escalas
+            .AsNoTracking()
+            .GroupBy(e => new { e.Data.Year, e.Data.Month })
+            .Select(g => new EscalaMesVM
+            {
+                Ano = g.Key.Year,
+                Mes = g.Key.Month
+            })
+            .OrderByDescending(x => x.Ano)
+            .ThenByDescending(x => x.Mes)
             .ToListAsync();
 
-        ViewData["Mes"] = mesAtual;
-        ViewData["Ano"] = anoAtual;
-        ViewData["Escalas"] = escalas;
+        var mesesList = await mesesQuery;
+        var mesesPaged = mesesList.ToPagedList(page, pageSize);
 
-        return View();
+        return View(mesesPaged);
     }
 
-    public async Task<IActionResult> Detalhes(int id)
+    public async Task<IActionResult> Detalhes(int mes, int ano)
     {
-        var escala = await _dbSolares.Escalas
+        var escalas = await _dbSolares.Escalas
+            .AsNoTracking()
             .Include(e => e.Dirigente)
-            .FirstOrDefaultAsync(e => e.Id == id);
+            .Where(e => e.Data.Month == mes && e.Data.Year == ano)
+            .OrderBy(e => e.Data)
+            .Select(e => new EscalaDiaVM
+            {
+                Data = e.Data,
+                Dirigente = e.Dirigente.Nome,
+                DirigenteId = e.Dirigente.Id
+            })
+            .ToListAsync();
 
-        if (escala == null)
+        if (!escalas.Any())
             return NotFound();
 
-        return View(escala);
-    }
+        var vm = new EscalaDetalheVM
+        {
+            Mes = mes,
+            Ano = ano,
+            Sabados = escalas
+        };
 
+        return View(vm);
+    }
 
     public IActionResult Criar()
     {
+        ViewData["MesAtual"] = DateTime.Now.Month;
+        ViewData["AnoAtual"] = DateTime.Now.Year;
+        ViewData["QtdMeses"] = 1;
+
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Criar(int mes, int ano)
+    public async Task<IActionResult> Criar(int mes, int ano, int quantidadeMeses)
     {
+        if (quantidadeMeses < 1)
+            quantidadeMeses = 1;
+
+        if (quantidadeMeses > 3)
+            quantidadeMeses = 3;
+
         var dirigentes = await _dbSolares.Dirigentes
             .Where(d => d.Ativo)
             .OrderBy(d => d.OrdemRodizio)
+            .AsNoTracking()
             .ToListAsync();
 
         if (!dirigentes.Any())
             return RedirectToAction(nameof(Index));
 
-        var data = new DateTime(ano, mes, 1);
-        var sabados = new List<DateTime>();
+        int dirigenteIndex = 0;
 
-        while (data.Month == mes)
+        for (int i = 0; i < quantidadeMeses; i++)
         {
-            if (data.DayOfWeek == DayOfWeek.Saturday)
-                sabados.Add(data);
+            int mesAtual = mes + i;
+            int anoAtual = ano;
 
-            data = data.AddDays(1);
-        }
-
-        int index = 0;
-
-        foreach (var sabado in sabados)
-        {
-            var dirigente = dirigentes[index % dirigentes.Count];
-
-            _dbSolares.Escalas.Add(new EscalaDeSabado
+            if (mesAtual > 12)
             {
-                Data = sabado,
-                DirigenteId = dirigente.Id
-            });
+                mesAtual -= 12;
+                anoAtual++;
+            }
 
-            index++;
+            var datasExistentes = await _dbSolares.Escalas
+                .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual)
+                .Select(e => e.Data)
+                .ToListAsync();
+
+            var data = new DateTime(anoAtual, mesAtual, 1);
+
+            while (data.Month == mesAtual)
+            {
+                if (data.DayOfWeek == DayOfWeek.Saturday &&
+                    !datasExistentes.Contains(data))
+                {
+                    var dirigente = dirigentes[dirigenteIndex % dirigentes.Count];
+
+                    _dbSolares.Escalas.Add(new EscalaDeSabado
+                    {
+                        Data = data,
+                        DirigenteId = dirigente.Id
+                    });
+
+                    dirigenteIndex++;
+                }
+
+                data = data.AddDays(1);
+            }
         }
 
         await _dbSolares.SaveChangesAsync();
 
-        return RedirectToAction(nameof(Index), new { mes, ano });
+        return RedirectToAction(nameof(Index));
     }
-    
+
+
     public async Task<IActionResult> Editar(int id)
     {
-        var escala = await _dbSolares.Escalas.FindAsync(id);
+        var escala = await _dbSolares.Escalas
+            .Include(e => e.Dirigente)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
         if (escala == null)
             return NotFound();
 
@@ -110,16 +160,21 @@ public class EscalaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Editar(int id, EscalaDeSabado escala)
+    public async Task<IActionResult> Editar(int id, int dirigenteId)
     {
-        if (ModelState.IsValid)
-        {
-            _dbSolares.Update(escala);
-            await _dbSolares.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        var escala = await _dbSolares.Escalas.FindAsync(id);
+        if (escala == null)
+            return NotFound();
 
-        ViewData["Dirigentes"] = await _dbSolares.Dirigentes.ToListAsync();
-        return View(escala);
+        escala.DirigenteId = dirigenteId;
+
+        await _dbSolares.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Detalhes), new
+        {
+            mes = escala.Data.Month,
+            ano = escala.Data.Year
+        });
     }
+
 }

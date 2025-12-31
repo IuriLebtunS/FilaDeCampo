@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "1pyT9/CxNp4=",
+  "dgSpecHash": "lRFDWxEFxm4=",
   "success": true,
   "projectFilePath": "C:\\Users\\lebtu\\Documents\\FilaDeCampo\\FilaDeCampo.csproj",
   "expectedPackageFiles": [
@@ -58,7 +58,9 @@
     "C:\\Users\\lebtu\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.4\\system.security.cryptography.pkcs.9.0.4.nupkg.sha512",
     "C:\\Users\\lebtu\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512",
     "C:\\Users\\lebtu\\.nuget\\packages\\system.security.permissions\\9.0.0\\system.security.permissions.9.0.0.nupkg.sha512",
-    "C:\\Users\\lebtu\\.nuget\\packages\\system.windows.extensions\\9.0.0\\system.windows.extensions.9.0.0.nupkg.sha512"
+    "C:\\Users\\lebtu\\.nuget\\packages\\system.windows.extensions\\9.0.0\\system.windows.extensions.9.0.0.nupkg.sha512",
+    "C:\\Users\\lebtu\\.nuget\\packages\\x.pagedlist\\10.5.9\\x.pagedlist.10.5.9.nupkg.sha512",
+    "C:\\Users\\lebtu\\.nuget\\packages\\x.pagedlist.mvc.core\\10.5.9\\x.pagedlist.mvc.core.10.5.9.nupkg.sha512"
   ],
   "logs": []
 }

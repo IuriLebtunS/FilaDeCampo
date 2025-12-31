@@ -20,8 +20,7 @@ public class DirigenteController : Controller
             .OrderBy(d => d.OrdemRodizio)
             .ToListAsync();
 
-        ViewData["Dirigentes"] = dirigentes;
-        return View();
+        return View(dirigentes);
     }
 
     public IActionResult Criar()

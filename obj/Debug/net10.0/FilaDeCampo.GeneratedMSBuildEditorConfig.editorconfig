@@ -34,6 +34,22 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlyaWdlbnRlXENyaWFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lebtu/Documents/FilaDeCampo/Views/Dirigente/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlyaWdlbnRlXEVkaXRhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lebtu/Documents/FilaDeCampo/Views/Dirigente/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlyaWdlbnRlXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lebtu/Documents/FilaDeCampo/Views/Escala/Criar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXNjYWxhXENyaWFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lebtu/Documents/FilaDeCampo/Views/Escala/Detalhes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXNjYWxhXERldGFsaGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lebtu/Documents/FilaDeCampo/Views/Escala/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXNjYWxhXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
