@@ -9,6 +9,7 @@ public class EscalaDetalheVM
 
 public class EscalaDiaVM
 {
+    public int Id { get; set; }          // 👈 Id da Escala
     public DateTime Data { get; set; }
     public int DirigenteId { get; set; }
     public string Dirigente { get; set; } = string.Empty;

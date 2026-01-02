@@ -3,7 +3,7 @@
 @using X.PagedList.Mvc.Core
 
 @{
-    ViewData["Title"] = "Dirigentes de Campo Sabados";
+    ViewData["Title"] = "Dirigentes dos Sabados";
 }
 
 <div class="d-flex justify-content-between align-items-center">
@@ -13,7 +13,7 @@
     </h2>
 
     <a asp-action="Criar" class="btn btn-primary">
-        Criar Escala
+        Criar
     </a>
 </div>
 
@@ -34,11 +34,8 @@ else
                     / @item.Ano
                 </span>
 
-                <a asp-action="Detalhes"
-                   asp-route-mes="@item.Mes"
-                   asp-route-ano="@item.Ano"
-                   class="btn btn-sm btn-outline-primary">
-                    Ver Detalhes
+                <a asp-action="Detalhes" asp-route-mes="@item.Mes" asp-route-ano="@item.Ano" class="btn btn-sm btn-outline-primary">
+                   Detalhes
                 </a>
             </li>
         }

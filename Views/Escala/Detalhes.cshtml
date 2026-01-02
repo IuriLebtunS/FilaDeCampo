@@ -1,14 +1,14 @@
 @model FilaDeCampo.ViewModels.Escala.EscalaDetalheVM
 
 @{
-    ViewData["Title"] = "Escala de Sábados";
+    ViewData["Title"] = "Escala";
 }
 
 <div class="d-flex align-items-center mb-3">
 
     <h2 class="mb-0">
         <i class="fa-solid fa-calendar-days me-2"></i>
-        @ViewData["Title"] – @Model.Mes/@Model.Ano
+        @ViewData["Title"] @Model.Mes/@Model.Ano
     </h2>
 
     <div class="ms-auto d-flex gap-2">
@@ -18,12 +18,11 @@
             Voltar
         </a>
 
-        <a asp-action="ExportarExcel" asp-route-mes="@Model.Mes" asp-route-ano="@Model.Ano"
-            class="btn btn-outline-success">
+        <a asp-action="ExportarExcelPeriodo" asp-route-mesInicial="@Model.Mes" asp-route-anoInicial="@Model.Ano"
+            asp-route-quantidadeMeses="3" class="btn btn-outline-success">
             <i class="fa-solid fa-file-excel me-1"></i>
             Excel
         </a>
-
 
     </div>
 
@@ -51,7 +50,7 @@
                     </span>
                 </div>
 
-                <a asp-controller="Escala" asp-action="Editar" asp-route-id="@item.DirigenteId"
+                <a asp-controller="Escala" asp-action="Editar" asp-route-id="@item.Id"
                     class="badge bg-primary fs-6 text-decoration-none">
                     <i class="fa-solid fa-user-tie me-1"></i>
                     @item.Dirigente
