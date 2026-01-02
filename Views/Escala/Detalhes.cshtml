@@ -1,4 +1,4 @@
-@model FilaDeCampo.ViewModels.EscalaDetalheVM
+@model FilaDeCampo.ViewModels.Escala.EscalaDetalheVM
 
 @{
     ViewData["Title"] = "Escala de Sábados";
@@ -51,7 +51,7 @@
                     </span>
                 </div>
 
-                <a asp-controller="Dirigente" asp-action="Editar" asp-route-id="@item.DirigenteId"
+                <a asp-controller="Escala" asp-action="Editar" asp-route-id="@item.DirigenteId"
                     class="badge bg-primary fs-6 text-decoration-none">
                     <i class="fa-solid fa-user-tie me-1"></i>
                     @item.Dirigente

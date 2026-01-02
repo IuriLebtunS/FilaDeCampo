@@ -1,4 +1,4 @@
-@model X.PagedList.IPagedList<FilaDeCampo.ViewModels.EscalaMesVM>
+@model X.PagedList.IPagedList<FilaDeCampo.ViewModels.Escala.EscalaMesVM>
 @using System.Globalization
 @using X.PagedList.Mvc.Core
 
@@ -26,7 +26,7 @@
 else
 {
     <ul class="list-group">
-        @foreach (FilaDeCampo.ViewModels.EscalaMesVM item in Model)
+        @foreach (FilaDeCampo.ViewModels.Escala.EscalaMesVM item in Model)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>

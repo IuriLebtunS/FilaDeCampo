@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using FilaDeCampo.Models;
 using FilaDeCampo.Data;
-using FilaDeCampo.ViewModels;
+using FilaDeCampo.ViewModels.Escala;
 using X.PagedList.Extensions;
 
 namespace FilaDeCampo.Controllers;
@@ -144,29 +145,42 @@ public class EscalaController : Controller
     public async Task<IActionResult> Editar(int id)
     {
         var escala = await _dbSolares.Escalas
-            .Include(e => e.Dirigente)
+            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (escala == null)
             return NotFound();
 
-        ViewData["Dirigentes"] = await _dbSolares.Dirigentes
-            .Where(d => d.Ativo)
-            .OrderBy(d => d.Nome)
-            .ToListAsync();
+        ViewData["Dirigentes"] = new SelectList(
+            await _dbSolares.Dirigentes
+                .Where(d => d.Ativo)
+                .OrderBy(d => d.Nome)
+                .ToListAsync(),
+            "Id",
+            "Nome",
+            escala.DirigenteId
+        );
 
-        return View(escala);
+        var vm = new EditarEscalaVM
+        {
+            EscalaId = escala.Id,
+            DirigenteId = escala.DirigenteId
+        };
+
+        return View(vm);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Editar(int id, int dirigenteId)
+    public async Task<IActionResult> Editar(EditarEscalaVM model)
     {
-        var escala = await _dbSolares.Escalas.FindAsync(id);
+        var escala = await _dbSolares.Escalas
+            .FirstOrDefaultAsync(e => e.Id == model.EscalaId);
+
         if (escala == null)
             return NotFound();
 
-        escala.DirigenteId = dirigenteId;
+        escala.DirigenteId = model.DirigenteId;
 
         await _dbSolares.SaveChangesAsync();
 
