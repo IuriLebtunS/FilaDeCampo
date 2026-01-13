@@ -1,4 +1,8 @@
-obj
-bin
 .vs
 .vscode
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
