@@ -1,21 +1,17 @@
 using FilaDeCampo.Data;
+using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ================= PORTA (Railway)
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-
-// ================= MVC
+// MVC
 builder.Services.AddControllersWithViews();
 
-// ================= DB
+// DbContext
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// ================= SESSION
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -26,19 +22,24 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// Middlewares
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
+app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
 
-app.UseSession();
+app.UseSession();       // <- Session deve vir antes de qualquer controller
 app.UseAuthorization();
 
-// ================= ROTAS
+// Rotas
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Congregacao}/{action=Login}/{id?}");
-
-// ================= TESTE
-app.MapGet("/health", () => "OK");
 
 app.Run();
