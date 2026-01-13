@@ -156,7 +156,6 @@ public class CongregacaoController : Controller
 
         TempData["Mensagem"] = $"Congregação '{model.Nome}' criada com sucesso!";
 
-        // Redireciona para o login da congregação
         return RedirectToAction("Login", "Congregacao");
     }
 }

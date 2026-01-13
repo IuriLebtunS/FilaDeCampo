@@ -1,24 +1,28 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FilaDeCampo</title>
-
+    <title>@ViewData["Title"] -ConReg</title>
     <!-- Bootstrap Bootswatch Pulse -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.8/pulse/bootstrap.min.css" />
 
     <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FilaDeCampo.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     @{
-        var perfil = Context.Session.GetString("Perfil"); // "Master" ou "Congregacao"
+        var perfil = Context.Session.GetString("Perfil"); // null se não logado
         var nomeUsuario = Context.Session.GetString("NomeUsuario") ?? "";
+        var estaLogado = !string.IsNullOrEmpty(perfil);
     }
 
     <!-- ===================== NAVBAR ===================== -->
@@ -26,18 +30,18 @@
         <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Congregacao" asp-action="Login">
-                   FilaDeCampo
+                    ConReg
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                        @if (!string.IsNullOrEmpty(perfil))
+                        @if (estaLogado)
                         {
-                            @* MENU PARA MASTER *@
+                            @* MASTER *@
                             @if (perfil == "Master")
                             {
                                 <li class="nav-item">
@@ -51,7 +55,7 @@
                                     </a>
                                 </li>
                             }
-                            @* MENU PARA CONGREGAÇÃO *@
+                            @* CONGREGAÇÃO *@
                             else if (perfil == "Congregacao")
                             {
                                 <li class="nav-item">
@@ -106,4 +110,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
