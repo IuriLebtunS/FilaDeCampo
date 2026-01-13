@@ -1,0 +1,53 @@
+﻿@model FilaDeCampo.ViewModels.LoginCongreVM
+
+@{
+    ViewData["Title"] = "Acesso ao Sistema";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h4 class="mb-0">ConReg</h4>
+                    <small class="text-muted">Sistema de Arquivos Automáticos</small>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Congregação</label>
+                            <select asp-for="CongregacaoId" asp-items="Model.Congregacoes" class="form-select">
+                                <option value="">Selecione a congregação</option>
+                            </select>
+                            <span asp-validation-for="CongregacaoId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Chave de Acesso</label>
+                            <input asp-for="ChaveAcesso" class="form-control" placeholder="Informe a chave" />
+                            <span asp-validation-for="ChaveAcesso" class="text-danger"></span>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <div class="mt-3 text-center">
+                        <a class="btn btn-warning" asp-action="LoginMaster">Login Master</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

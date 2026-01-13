@@ -1,4 +1,4 @@
-namespace FilaDeCampo.ViewModels;
+namespace FilaDeCampo.ViewModels.Escala;
 
 public class EscalaMesVM
 {

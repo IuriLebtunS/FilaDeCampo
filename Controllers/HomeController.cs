@@ -1,24 +1,48 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using FilaDeCampo.Models;
-
-namespace FilaDeCampo.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private const string MasterEmail = "Lebtuniuri@gmail.com";
+    private const string MasterSenha = "Mortadela1";
+
+    [HttpGet]
+    public IActionResult LoginMaster()
     {
         return View();
     }
 
-    public IActionResult Privacy()
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult LoginMaster(string usuario, string senha)
     {
+        if (!string.IsNullOrWhiteSpace(usuario) &&
+            usuario.Equals(MasterEmail, StringComparison.OrdinalIgnoreCase) &&
+            senha == MasterSenha)
+        {
+            HttpContext.Session.SetString("Perfil", "Master");
+            HttpContext.Session.SetString("NomeUsuario", "Iuri");
+            return RedirectToAction("DashboardMaster");
+        }
+
+        ModelState.AddModelError("", "Usuário ou senha incorretos.");
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    [HttpGet]
+    public IActionResult DashboardMaster()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        if (HttpContext.Session.GetString("Perfil") != "Master")
+            return Forbid();
+
+        ViewBag.NomeUsuario = HttpContext.Session.GetString("NomeUsuario");
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Login", "Congregacao");
     }
 }

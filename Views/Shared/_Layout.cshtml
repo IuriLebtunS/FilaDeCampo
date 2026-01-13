@@ -1,55 +1,114 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FilaDeCampo</title>
-
+    <title>@ViewData["Title"] -ConReg</title>
+    <!-- Bootstrap Bootswatch Pulse -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.8/pulse/bootstrap.min.css" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Seus estilos -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FilaDeCampo.styles.css" asp-append-version="true" />
-    
 </head>
+
 <body>
+    @{
+        var perfil = Context.Session.GetString("Perfil"); // null se não logado
+        var nomeUsuario = Context.Session.GetString("NomeUsuario") ?? "";
+        var estaLogado = !string.IsNullOrEmpty(perfil);
+    }
+
+    <!-- ===================== NAVBAR ===================== -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FilaDeCampo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-area="" asp-controller="Congregacao" asp-action="Login">
+                    ConReg
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Escala" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Dirigente" asp-action="Index">Dirigentes</a>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                        @if (estaLogado)
+                        {
+                            @* MASTER *@
+                            @if (perfil == "Master")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Congregacao" asp-action="DashboardMaster">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Congregacao" asp-action="Criar">
+                                        Criar Congregação
+                                    </a>
+                                </li>
+                            }
+                            @* CONGREGAÇÃO *@
+                            else if (perfil == "Congregacao")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">Escalas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Dirigente" asp-action="Index">Dirigentes</a>
+                                </li>
+                            }
+                        }
                     </ul>
+
+                    @* Botão logout e nome usuário *@
+                    @if (!string.IsNullOrEmpty(perfil))
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item me-2 text-white d-flex align-items-center">
+                                <i class="fas fa-user-circle me-1"></i> @nomeUsuario
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" asp-controller="Congregacao" asp-action="Logout">
+                                    <button type="submit" class="btn btn-outline-light btn-sm">
+                                        Sair
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- ===================== BODY ===================== -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - FilaDeCampo - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container d-flex justify-content-between py-2">
+            <span>&copy; 2025 - FilaDeCampo</span>
+            <span><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> | v1.0</span>
         </div>
     </footer>
+
+    <!-- ===================== SCRIPTS ===================== -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

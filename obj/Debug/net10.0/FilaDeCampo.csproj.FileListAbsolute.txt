@@ -235,3 +235,11 @@ C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\ref\FilaDeCampo.dll
 C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\X.PagedList.dll
 C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\X.PagedList.Mvc.Core.dll
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net10.0\FilaDeCampo.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\ClosedXML.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\ExcelNumberFormat.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\RBush.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\SixLabors.Fonts.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net10.0\System.IO.Packaging.dll

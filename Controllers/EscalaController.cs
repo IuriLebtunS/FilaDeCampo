@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
+using FilaDeCampo.ViewModels.Escala;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList.Extensions;
+using System.Globalization;
 using FilaDeCampo.Models;
 using FilaDeCampo.Data;
-using FilaDeCampo.ViewModels;
-using X.PagedList.Extensions;
+using ClosedXML.Excel;
 
 namespace FilaDeCampo.Controllers;
 
@@ -15,7 +18,6 @@ public class EscalaController : Controller
     {
         _dbSolares = dbsolares;
     }
-
 
     public async Task<IActionResult> Index(int page = 1)
     {
@@ -48,6 +50,7 @@ public class EscalaController : Controller
             .OrderBy(e => e.Data)
             .Select(e => new EscalaDiaVM
             {
+                Id = e.Id,
                 Data = e.Data,
                 Dirigente = e.Dirigente.Nome,
                 DirigenteId = e.Dirigente.Id
@@ -144,29 +147,42 @@ public class EscalaController : Controller
     public async Task<IActionResult> Editar(int id)
     {
         var escala = await _dbSolares.Escalas
-            .Include(e => e.Dirigente)
+            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (escala == null)
             return NotFound();
 
-        ViewData["Dirigentes"] = await _dbSolares.Dirigentes
-            .Where(d => d.Ativo)
-            .OrderBy(d => d.Nome)
-            .ToListAsync();
+        ViewData["Dirigentes"] = new SelectList(
+            await _dbSolares.Dirigentes
+                .Where(d => d.Ativo)
+                .OrderBy(d => d.Nome)
+                .ToListAsync(),
+            "Id",
+            "Nome",
+            escala.DirigenteId
+        );
 
-        return View(escala);
+        var vm = new EditarEscalaVM
+        {
+            EscalaId = escala.Id,
+            DirigenteId = escala.DirigenteId
+        };
+
+        return View(vm);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Editar(int id, int dirigenteId)
+    public async Task<IActionResult> Editar(EditarEscalaVM model)
     {
-        var escala = await _dbSolares.Escalas.FindAsync(id);
+        var escala = await _dbSolares.Escalas
+            .FirstOrDefaultAsync(e => e.Id == model.EscalaId);
+
         if (escala == null)
             return NotFound();
 
-        escala.DirigenteId = dirigenteId;
+        escala.DirigenteId = model.DirigenteId;
 
         await _dbSolares.SaveChangesAsync();
 
@@ -177,4 +193,73 @@ public class EscalaController : Controller
         });
     }
 
+    public async Task<IActionResult> ExportarExcelPeriodo(int mesInicial,int anoInicial,int quantidadeMeses)
+    {
+        if (quantidadeMeses < 1)
+            quantidadeMeses = 1;
+
+        if (quantidadeMeses > 3)
+            quantidadeMeses = 3;
+
+        var dataInicio = new DateTime(anoInicial, mesInicial, 1);
+        var dataFim = dataInicio.AddMonths(quantidadeMeses).AddDays(-1);
+
+        var escalas = await _dbSolares.Escalas
+            .AsNoTracking()
+            .Include(e => e.Dirigente)
+            .Where(e => e.Data >= dataInicio && e.Data <= dataFim)
+            .OrderBy(e => e.Data)
+            .ToListAsync();
+
+        if (!escalas.Any())
+            return NotFound("Nenhuma escala encontrada.");
+
+        using var workbook = new XLWorkbook();
+
+        var grupos = escalas
+            .GroupBy(e => new { e.Data.Year, e.Data.Month })
+            .OrderBy(g => g.Key.Year)
+            .ThenBy(g => g.Key.Month);
+
+        foreach (var grupo in grupos)
+        {
+            var nomeAba = $"{grupo.Key.Month:D2}-{grupo.Key.Year}";
+            var ws = workbook.Worksheets.Add(nomeAba);
+
+            // Cabeçalho
+            ws.Cell(1, 1).Value = "Data";
+            ws.Cell(1, 2).Value = "Dia da Semana";
+            ws.Cell(1, 3).Value = "Dirigente";
+
+            ws.Range("A1:C1").Style.Font.Bold = true;
+            ws.Range("A1:C1").Style.Fill.BackgroundColor = XLColor.LightGray;
+
+            int linha = 2;
+
+            foreach (var escala in grupo)
+            {
+                ws.Cell(linha, 1).Value = escala.Data.ToString("dd/MM/yyyy");
+                ws.Cell(linha, 2).Value =
+                    CultureInfo.GetCultureInfo("pt-BR")
+                        .DateTimeFormat.GetDayName(escala.Data.DayOfWeek);
+                ws.Cell(linha, 3).Value = escala.Dirigente.Nome;
+                linha++;
+            }
+
+            ws.Columns().AdjustToContents();
+        }
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        var nomeArquivo =
+            $"Escala_{dataInicio:MM-yyyy}_a_{dataFim:MM-yyyy}.xlsx";
+
+        return File(
+            stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            nomeArquivo
+        );
+    }
 }

@@ -1,0 +1,27 @@
+@model FilaDeCampo.ViewModels.Escala.EditarEscalaVM
+
+@{
+    ViewData["Title"] = "Editar Escala";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<form asp-action="Editar" method="post">
+
+    <input type="hidden" asp-for="EscalaId" />
+
+    <div class="mb-3">
+        <label asp-for="DirigenteId" class="form-label">
+            Dirigente do Sábado
+        </label>
+
+        <select asp-for="DirigenteId" asp-items="@(ViewData["Dirigentes"] as SelectList)" class="form-select">
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+
+</form>
