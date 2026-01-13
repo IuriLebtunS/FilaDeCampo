@@ -3,19 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ==================== PORTA (OBRIGATÓRIO NO RAILWAY)
+// ================= PORTA (Railway)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-// ==================== MVC
+// ================= MVC
 builder.Services.AddControllersWithViews();
 
-// ==================== DB CONTEXT
+// ================= DB
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("Default")));
 
-// ==================== SESSION
+// ================= SESSION
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -26,21 +26,19 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// ==================== MIDDLEWARES
 
 app.UseStaticFiles();
-
 app.UseRouting();
 
-app.UseSession();        // ✔ antes dos controllers
+app.UseSession();
 app.UseAuthorization();
 
-// ==================== ROTAS
+// ================= ROTAS
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Congregacao}/{action=Login}/{id?}");
 
-// ==================== HEALTH CHECK (recomendado)
+// ================= TESTE
 app.MapGet("/health", () => "OK");
 
 app.Run();
