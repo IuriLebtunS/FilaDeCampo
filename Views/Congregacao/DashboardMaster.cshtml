@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Dashboard Master";
+    var nomeUsuario = ViewData["NomeUsuario"] as string ?? "Master";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h4 class="mb-0">Dashboard Master</h4>
+                    <small class="text-muted">Bem-vindo, @nomeUsuario!</small>
+                </div>
+                <div class="card-body">
+
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" asp-controller="Congregacao" asp-action="Criar">
+                            Criar Congregação
+                        </a>
+                        <form asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

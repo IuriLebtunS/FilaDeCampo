@@ -10,4 +10,5 @@ public class DbSolaresCampo : DbContext
     public DbSet<Dirigente> Dirigentes => Set<Dirigente>();
     public DbSet<EscalaDeSabado> Escalas => Set<EscalaDeSabado>();
     public DbSet<Configuracao> Configuracoes => Set<Configuracao>();
+    public DbSet<Congregacao> Congregacoes => Set<Congregacao>();   
 }

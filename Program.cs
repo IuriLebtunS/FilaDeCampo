@@ -1,19 +1,27 @@
-using FilaDeCampo.Services;
 using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<FilaService>();
 
-// DB CONTEXT
+// DbContext
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+// Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
+// Middlewares
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -21,16 +29,16 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
+app.UseSession();       // <- Session deve vir antes de qualquer controller
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// Rotas
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Escala}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Congregacao}/{action=Login}/{id?}");
 
 app.Run();
