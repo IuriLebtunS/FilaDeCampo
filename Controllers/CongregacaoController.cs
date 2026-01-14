@@ -154,7 +154,6 @@ public class CongregacaoController : Controller
         await _db.SaveChangesAsync();
 
         // Mensagem de sucesso
-        TempData["Mensagem"] = $"Congregação '{model.Nome}' criada com sucesso!";
         _notification.AddSuccessToastMessage($"Congregação '{model.Nome}' criada com sucesso!");
 
 

@@ -13,13 +13,14 @@
                 </div>
                 <div class="card-body">
 
-                    <div class="d-grid gap-2">
-                        <a class="btn btn-primary rounded-pill" asp-controller="Congregacao" asp-action="Criar">
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <a class="btn btn-primary rounded-pill w-50" asp-controller="Congregacao" asp-action="Criar">
                             Criar Congregação
                         </a>
+
                         <form asp-action="Logout" method="post">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger">Logout</button>
+                            <button type="submit" class="btn btn-danger rounded-pill">Logout</button>
                         </form>
                     </div>
                 </div>
