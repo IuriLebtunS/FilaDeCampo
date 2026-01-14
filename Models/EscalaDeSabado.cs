@@ -6,5 +6,7 @@ public class EscalaDeSabado
     public DateTime Data { get; set; }
     public int DirigenteId { get; set; }
     public Dirigente Dirigente { get; set; } = null!;
+    public int CongregacaoId { get; set; }
+    public Congregacao Congregacao { get; set; } = null!;
     public string? Observacao { get; set; }
 }

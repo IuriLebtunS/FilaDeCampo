@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FilaDeCampo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1263b69813bc0f56dda8a487ef7cda0b87c9b15e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a274a64ef32df1a571f748a319b91c32696d02d1")]
 [assembly: System.Reflection.AssemblyProductAttribute("FilaDeCampo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FilaDeCampo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

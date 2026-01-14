@@ -15,9 +15,13 @@ public class CongregacaoController : Controller
         _db = db;
     }
 
+    // ================= LOGIN CONGREGAÇÃO =================
     [HttpGet]
     public async Task<IActionResult> Login()
     {
+        // Limpa sessão ao acessar login
+        HttpContext.Session.Clear();
+
         var vm = new LoginCongreVM
         {
             Congregacoes = await _db.Congregacoes
@@ -59,6 +63,7 @@ public class CongregacaoController : Controller
             return View(model);
         }
 
+        // ================= SESSÃO =================
         HttpContext.Session.SetInt32("CongregacaoId", congregacao.Id);
         HttpContext.Session.SetString("CongregacaoNome", congregacao.Nome);
         HttpContext.Session.SetString("Perfil", "Congregacao");
@@ -66,11 +71,9 @@ public class CongregacaoController : Controller
         return RedirectToAction("Index", "Escala");
     }
 
+    // ================= LOGIN MASTER =================
     [HttpGet]
-    public IActionResult LoginMaster()
-    {
-        return View();
-    }
+    public IActionResult LoginMaster() => View();
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -89,19 +92,18 @@ public class CongregacaoController : Controller
         return View();
     }
 
+    // ================= DASHBOARD MASTER =================
     [HttpGet]
     public IActionResult DashboardMaster()
     {
-        // Só Master pode acessar
         if (HttpContext.Session.GetString("Perfil") != "Master")
             return Forbid();
 
-        // Passa o nome do usuário via ViewData
         ViewData["NomeUsuario"] = HttpContext.Session.GetString("NomeUsuario") ?? "Master";
-
         return View();
     }
 
+    // ================= LOGOUT =================
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Logout()
@@ -110,16 +112,16 @@ public class CongregacaoController : Controller
         return RedirectToAction("Login", "Congregacao");
     }
 
-     [HttpGet]
+    // ================= CRIAR CONGREGAÇÃO =================
+    [HttpGet]
     public IActionResult Criar()
     {
         if (HttpContext.Session.GetString("Perfil") != "Master")
-            return Forbid(); // só Master pode criar
+            return Forbid();
 
         return View(new CriarCongreVM());
     }
 
-    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(CriarCongreVM model)
@@ -143,7 +145,7 @@ public class CongregacaoController : Controller
             return View(model);
         }
 
-        // Cria a congregação
+        // Cria a congregação **vazia**, sem copiar dados de outra
         var congregacao = new FilaDeCampo.Models.Congregacao
         {
             Nome = model.Nome,
@@ -154,8 +156,10 @@ public class CongregacaoController : Controller
         _db.Congregacoes.Add(congregacao);
         await _db.SaveChangesAsync();
 
+        // Mensagem de sucesso
         TempData["Mensagem"] = $"Congregação '{model.Nome}' criada com sucesso!";
 
+        // Redireciona para login da congregação (vazio)
         return RedirectToAction("Login", "Congregacao");
     }
 }
