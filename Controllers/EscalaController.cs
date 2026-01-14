@@ -14,17 +14,20 @@ public class EscalaController : Controller
 {
     private readonly DbSolaresCampo _dbSolares;
 
-    public EscalaController(DbSolaresCampo dbsolares)
+    public EscalaController(DbSolaresCampo dbSolares)
     {
-        _dbSolares = dbsolares;
+        _dbSolares = dbSolares;
     }
 
     public async Task<IActionResult> Index(int page = 1)
     {
         const int pageSize = 10;
 
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+
         var mesesQuery = _dbSolares.Escalas
             .AsNoTracking()
+            .Where(e => e.Dirigente.CongregacaoId == congregacaoId)
             .GroupBy(e => new { e.Data.Year, e.Data.Month })
             .Select(g => new EscalaMesVM
             {
@@ -43,10 +46,13 @@ public class EscalaController : Controller
 
     public async Task<IActionResult> Detalhes(int mes, int ano)
     {
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+
         var escalas = await _dbSolares.Escalas
             .AsNoTracking()
             .Include(e => e.Dirigente)
-            .Where(e => e.Data.Month == mes && e.Data.Year == ano)
+            .Where(e => e.Data.Month == mes && e.Data.Year == ano
+                        && e.Dirigente.CongregacaoId == congregacaoId)
             .OrderBy(e => e.Data)
             .Select(e => new EscalaDiaVM
             {
@@ -75,7 +81,6 @@ public class EscalaController : Controller
         ViewData["MesAtual"] = DateTime.Now.Month;
         ViewData["AnoAtual"] = DateTime.Now.Year;
         ViewData["QtdMeses"] = 1;
-
         return View();
     }
 
@@ -83,14 +88,13 @@ public class EscalaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(int mes, int ano, int quantidadeMeses)
     {
-        if (quantidadeMeses < 1)
-            quantidadeMeses = 1;
+        if (quantidadeMeses < 1) quantidadeMeses = 1;
+        if (quantidadeMeses > 3) quantidadeMeses = 3;
 
-        if (quantidadeMeses > 3)
-            quantidadeMeses = 3;
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
 
         var dirigentes = await _dbSolares.Dirigentes
-            .Where(d => d.Ativo)
+            .Where(d => d.Ativo && d.CongregacaoId == congregacaoId)
             .OrderBy(d => d.OrdemRodizio)
             .AsNoTracking()
             .ToListAsync();
@@ -112,7 +116,8 @@ public class EscalaController : Controller
             }
 
             var datasExistentes = await _dbSolares.Escalas
-                .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual)
+                .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual
+                            && e.Dirigente.CongregacaoId == congregacaoId)
                 .Select(e => e.Data)
                 .ToListAsync();
 
@@ -128,7 +133,9 @@ public class EscalaController : Controller
                     _dbSolares.Escalas.Add(new EscalaDeSabado
                     {
                         Data = data,
-                        DirigenteId = dirigente.Id
+                        DirigenteId = dirigente.Id,
+                        CongregacaoId = congregacaoId 
+
                     });
 
                     dirigenteIndex++;
@@ -143,11 +150,13 @@ public class EscalaController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-
     public async Task<IActionResult> Editar(int id)
     {
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+
         var escala = await _dbSolares.Escalas
-            .AsNoTracking()
+            .Include(e => e.Dirigente)
+            .Where(e => e.Dirigente.CongregacaoId == congregacaoId)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (escala == null)
@@ -155,7 +164,7 @@ public class EscalaController : Controller
 
         ViewData["Dirigentes"] = new SelectList(
             await _dbSolares.Dirigentes
-                .Where(d => d.Ativo)
+                .Where(d => d.Ativo && d.CongregacaoId == congregacaoId)
                 .OrderBy(d => d.Nome)
                 .ToListAsync(),
             "Id",
@@ -176,14 +185,17 @@ public class EscalaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(EditarEscalaVM model)
     {
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+
         var escala = await _dbSolares.Escalas
+            .Include(e => e.Dirigente)
+            .Where(e => e.Dirigente.CongregacaoId == congregacaoId)
             .FirstOrDefaultAsync(e => e.Id == model.EscalaId);
 
         if (escala == null)
             return NotFound();
 
         escala.DirigenteId = model.DirigenteId;
-
         await _dbSolares.SaveChangesAsync();
 
         return RedirectToAction(nameof(Detalhes), new
@@ -193,13 +205,13 @@ public class EscalaController : Controller
         });
     }
 
-    public async Task<IActionResult> ExportarExcelPeriodo(int mesInicial,int anoInicial,int quantidadeMeses)
+    // ================= EXPORTAR =================
+    public async Task<IActionResult> ExportarExcelPeriodo(int mesInicial, int anoInicial, int quantidadeMeses)
     {
-        if (quantidadeMeses < 1)
-            quantidadeMeses = 1;
+        if (quantidadeMeses < 1) quantidadeMeses = 1;
+        if (quantidadeMeses > 3) quantidadeMeses = 3;
 
-        if (quantidadeMeses > 3)
-            quantidadeMeses = 3;
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
 
         var dataInicio = new DateTime(anoInicial, mesInicial, 1);
         var dataFim = dataInicio.AddMonths(quantidadeMeses).AddDays(-1);
@@ -207,7 +219,8 @@ public class EscalaController : Controller
         var escalas = await _dbSolares.Escalas
             .AsNoTracking()
             .Include(e => e.Dirigente)
-            .Where(e => e.Data >= dataInicio && e.Data <= dataFim)
+            .Where(e => e.Data >= dataInicio && e.Data <= dataFim
+                        && e.Dirigente.CongregacaoId == congregacaoId)
             .OrderBy(e => e.Data)
             .ToListAsync();
 
@@ -215,7 +228,6 @@ public class EscalaController : Controller
             return NotFound("Nenhuma escala encontrada.");
 
         using var workbook = new XLWorkbook();
-
         var grupos = escalas
             .GroupBy(e => new { e.Data.Year, e.Data.Month })
             .OrderBy(g => g.Key.Year)
@@ -226,7 +238,6 @@ public class EscalaController : Controller
             var nomeAba = $"{grupo.Key.Month:D2}-{grupo.Key.Year}";
             var ws = workbook.Worksheets.Add(nomeAba);
 
-            // Cabeçalho
             ws.Cell(1, 1).Value = "Data";
             ws.Cell(1, 2).Value = "Dia da Semana";
             ws.Cell(1, 3).Value = "Dirigente";
@@ -253,8 +264,7 @@ public class EscalaController : Controller
         workbook.SaveAs(stream);
         stream.Position = 0;
 
-        var nomeArquivo =
-            $"Escala_{dataInicio:MM-yyyy}_a_{dataFim:MM-yyyy}.xlsx";
+        var nomeArquivo = $"Escala_{dataInicio:MM-yyyy}_a_{dataFim:MM-yyyy}.xlsx";
 
         return File(
             stream.ToArray(),

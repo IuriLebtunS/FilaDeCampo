@@ -1,42 +1,75 @@
+@model FilaDeCampo.ViewModels.LoginMasterVM
 @{
     ViewData["Title"] = "Login Master";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header text-center">
-                    <h4 class="mb-0">ConReg</h4>
-                    <small class="text-muted">Login Master</small>
-                </div>
-                <div class="card-body">
-                    <form asp-action="LoginMaster" method="post">
-                        @Html.AntiForgeryToken()
+<!-- =============================================
+     Styles: CSS terminal separado
+     ============================================= -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/login-master-terminal.css" />
+}
 
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input name="usuario" class="form-control" placeholder="Informe seu email" />
-                        </div>
+<!-- =============================================
+     Scripts: JS de erro estilo DOS
+     ============================================= -->
+@section Scripts {
+    <script src="~/js/login-master-terminal.js"></script>
 
-                        <div class="mb-3">
-                            <label class="form-label">Senha</label>
-                            <input type="password" name="senha" class="form-control" placeholder="Informe sua senha" />
-                        </div>
+   <script>
+        window.falhaLogin = !@ViewData.ModelState.IsValid.ToString().ToLower();
+    </script>
+}
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Entrar como Master</button>
-                        </div>
-                    </form>
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="col-md-5">
+        <div class="card terminal-card">
+            <!-- HEADER -->
+            <div class="card-header terminal-header">
+                <h4 class="cursor">C:\ConReg\MASTER></h4>
+                <small>*** ACESSO RESTRITO ***</small>
+            </div>
 
-                    <hr />
+            <!-- BODY -->
+            <div class="card-body">
+                <form asp-action="LoginMaster" method="post" autocomplete="off">
+                    @Html.AntiForgeryToken()
 
-                    <div class="mt-3 text-center">
-                        <a class="btn btn-secondary" asp-controller="Congregacao" asp-action="Login">
-                            Voltar ao login da congregação
-                        </a>
+                    <!-- USUÁRIO -->
+                    <div class="mb-3">
+                        <label class="form-label">USUARIO</label>
+                        <input asp-for="Usuario" class="form-control terminal-input" placeholder="Digite seu usuario"
+                            required />
+                        <span asp-validation-for="Usuario" class="text-danger"></span>
                     </div>
-                </div>
+
+                    <!-- SENHA -->
+                    <div class="mb-3">
+                        <label class="form-label">SENHA</label>
+                        <input asp-for="Senha" type="password" class="form-control terminal-input"
+                            placeholder="Digite sua senha" required />
+                        <span asp-validation-for="Senha" class="text-danger"></span>
+                    </div>
+
+                    <!-- BOTÃO LOGIN -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="terminal-btn">
+                            EXEC LOGIN
+                        </button>
+                    </div>
+                </form>
+
+                <!-- LOGS DO SISTEMA -->
+                <div id="dos-log" class="dos-log mt-3"></div>
+
+                <hr />
+
+                <!-- VOLTAR -->
+                <form id="voltarForm" method="post" asp-controller="Congregacao" asp-action="Logout">
+                    <button type="submit" class="terminal-btn w-100 mt-3">
+                        VOLTAR \\ LOGIN
+                    </button>
+                </form>
             </div>
         </div>
     </div>

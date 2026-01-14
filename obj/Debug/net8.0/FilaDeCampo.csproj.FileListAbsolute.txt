@@ -149,3 +149,9 @@ C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net8.0\refint\FilaDeCampo.dll
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net8.0\FilaDeCampo.pdb
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net8.0\FilaDeCampo.genruntimeconfig.cache
 C:\Users\lebtu\Documents\FilaDeCampo\obj\Debug\net8.0\ref\FilaDeCampo.dll
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\web.config
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\appsettings.Development.json
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\appsettings.json
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\FilaDeCampo.deps.json
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\FilaDeCampo.runtimeconfig.json
+C:\Users\lebtu\Documents\FilaDeCampo\bin\Debug\net8.0\out\FilaDeCampo.staticwebassets.endpoints.json

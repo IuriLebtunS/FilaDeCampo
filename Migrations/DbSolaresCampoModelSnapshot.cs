@@ -17,7 +17,7 @@ namespace FilaDeCampo.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -30,10 +30,15 @@ namespace FilaDeCampo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CongregacaoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UltimoDirigenteId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CongregacaoId");
 
                     b.ToTable("Configuracoes");
                 });
@@ -73,6 +78,9 @@ namespace FilaDeCampo.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("CongregacaoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -81,6 +89,8 @@ namespace FilaDeCampo.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CongregacaoId");
 
                     b.ToTable("Dirigentes");
                 });
@@ -93,6 +103,9 @@ namespace FilaDeCampo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CongregacaoId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
@@ -104,20 +117,55 @@ namespace FilaDeCampo.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CongregacaoId");
+
                     b.HasIndex("DirigenteId");
 
                     b.ToTable("Escalas");
                 });
 
+            modelBuilder.Entity("FilaDeCampo.Models.Configuracao", b =>
+                {
+                    b.HasOne("FilaDeCampo.Models.Congregacao", "Congregacao")
+                        .WithMany()
+                        .HasForeignKey("CongregacaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Congregacao");
+                });
+
+            modelBuilder.Entity("FilaDeCampo.Models.Dirigente", b =>
+                {
+                    b.HasOne("FilaDeCampo.Models.Congregacao", "Congregacao")
+                        .WithMany("Dirigentes")
+                        .HasForeignKey("CongregacaoId");
+
+                    b.Navigation("Congregacao");
+                });
+
             modelBuilder.Entity("FilaDeCampo.Models.EscalaDeSabado", b =>
                 {
+                    b.HasOne("FilaDeCampo.Models.Congregacao", "Congregacao")
+                        .WithMany()
+                        .HasForeignKey("CongregacaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FilaDeCampo.Models.Dirigente", "Dirigente")
                         .WithMany()
                         .HasForeignKey("DirigenteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Congregacao");
+
                     b.Navigation("Dirigente");
+                });
+
+            modelBuilder.Entity("FilaDeCampo.Models.Congregacao", b =>
+                {
+                    b.Navigation("Dirigentes");
                 });
 #pragma warning restore 612, 618
         }
