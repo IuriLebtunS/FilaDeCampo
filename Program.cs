@@ -1,11 +1,18 @@
 using FilaDeCampo.Data;
-using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify; // <- Import necessário
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
-builder.Services.AddControllersWithViews();
+// MVC + NToastNotify
+builder.Services.AddControllersWithViews()
+    .AddNToastNotifyToastr(new ToastrOptions
+    {
+        ProgressBar = true,
+        PositionClass = ToastPositions.TopRight,
+        PreventDuplicates = true,
+        CloseButton = true
+    });
 
 // DbContext
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
@@ -34,8 +41,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();       // <- Session deve vir antes de qualquer controller
+app.UseSession();       // <- Session antes dos controllers
 app.UseAuthorization();
+
+// **Middleware do NToastNotify**
+app.UseNToastNotify();
 
 // Rotas
 app.MapControllerRoute(

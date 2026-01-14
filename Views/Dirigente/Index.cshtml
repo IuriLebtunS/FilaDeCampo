@@ -12,7 +12,7 @@
     </h1>
 
     <div class="ms-auto">
-        <a asp-action="Criar" class="btn btn-primary">
+        <a asp-action="Criar" class="btn btn-primary rounded-pill">
             <i class="fa-solid fa-plus me-1"></i>
             Novo Dirigente
         </a>
@@ -38,10 +38,11 @@ else
                asp-action="Editar"
                asp-route-id="@dirigente.Id">
 
-                <span>
-                    <strong>@dirigente.OrdemRodizio</strong> —
-                    @dirigente.Nome
-                </span>
+                <span class="d-flex align-items-center gap-2">
+                <strong>@dirigente.OrdemRodizio</strong> 
+                <i class="fa-solid fa-user text-primary"></i> <!-- ícone de usuário -->
+                @dirigente.Nome
+            </span>
 
                 <i class="fa-solid fa-chevron-right text-muted"></i>
             </a>
