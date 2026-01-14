@@ -1,8 +1,55 @@
-.vs
-.vscode
+# Visual Studio / IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.idea
+
+# Build folders
 bin/
 obj/
 out/
+publish/
+
+# Executáveis e binários
 *.dll
 *.exe
 *.pdb
+*.app
+*.msi
+
+# Logs e arquivos temporários
+*.log
+*.cache
+*.tmp
+*.bak
+
+# NuGet
+*.nupkg
+packages/
+*.nuget.props
+*.nuget.targets
+
+# Rider / JetBrains
+.idea/
+
+# Publish / deployment
+wwwroot/lib/
+*.deploy
+*.publish
+
+# Front-end / Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Test / coverage
+TestResults/
+*.coverage
+*.coveragexml
+
+# JetBrains Rider
+.idea/
+
+# VS Code
+.history/

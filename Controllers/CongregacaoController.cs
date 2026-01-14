@@ -3,19 +3,21 @@ using FilaDeCampo.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 
 public class CongregacaoController : Controller
 {
     private readonly DbSolaresCampo _db;
+    private readonly IToastNotification _notification;
     private const string MasterEmail = "Lebtuniuri@gmail.com";
     private const string MasterSenha = "Mortadela1";
 
-    public CongregacaoController(DbSolaresCampo db)
+    public CongregacaoController(DbSolaresCampo db, IToastNotification notification)
     {
         _db = db;
+        _notification = notification;
     }
 
-    // ================= LOGIN CONGREGAÇÃO =================
     [HttpGet]
     public async Task<IActionResult> Login()
     {
@@ -63,7 +65,6 @@ public class CongregacaoController : Controller
             return View(model);
         }
 
-        // ================= SESSÃO =================
         HttpContext.Session.SetInt32("CongregacaoId", congregacao.Id);
         HttpContext.Session.SetString("CongregacaoNome", congregacao.Nome);
         HttpContext.Session.SetString("Perfil", "Congregacao");
@@ -71,7 +72,6 @@ public class CongregacaoController : Controller
         return RedirectToAction("Index", "Escala");
     }
 
-    // ================= LOGIN MASTER =================
     [HttpGet]
     public IActionResult LoginMaster() => View();
 
@@ -92,7 +92,6 @@ public class CongregacaoController : Controller
         return View();
     }
 
-    // ================= DASHBOARD MASTER =================
     [HttpGet]
     public IActionResult DashboardMaster()
     {
@@ -103,7 +102,6 @@ public class CongregacaoController : Controller
         return View();
     }
 
-    // ================= LOGOUT =================
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Logout()
@@ -112,7 +110,6 @@ public class CongregacaoController : Controller
         return RedirectToAction("Login", "Congregacao");
     }
 
-    // ================= CRIAR CONGREGAÇÃO =================
     [HttpGet]
     public IActionResult Criar()
     {
@@ -157,7 +154,8 @@ public class CongregacaoController : Controller
         await _db.SaveChangesAsync();
 
         // Mensagem de sucesso
-        TempData["Mensagem"] = $"Congregação '{model.Nome}' criada com sucesso!";
+        _notification.AddSuccessToastMessage($"Congregação '{model.Nome}' criada com sucesso!");
+
 
         // Redireciona para login da congregação (vazio)
         return RedirectToAction("Login", "Congregacao");
