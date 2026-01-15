@@ -1,10 +1,12 @@
 using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify; // <- Import necessário
+using NToastNotify;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ================================
 // MVC + NToastNotify
+// ================================
 builder.Services.AddControllersWithViews()
     .AddNToastNotifyToastr(new ToastrOptions
     {
@@ -14,11 +16,17 @@ builder.Services.AddControllersWithViews()
         CloseButton = true
     });
 
+// ================================
 // DbContext
+// ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default")
+    ));
 
+// ================================
 // Session
+// ================================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -27,9 +35,27 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// ================================
+// 🚀 CONFIGURAÇÃO OBRIGATÓRIA PARA RAILWAY
+// ================================
+var portVar = Environment.GetEnvironmentVariable("PORT");
+
+if (!string.IsNullOrEmpty(portVar) && int.TryParse(portVar, out int port))
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(port);
+    });
+}
+
+// ================================
+// Build
+// ================================
 var app = builder.Build();
 
+// ================================
 // Middlewares
+// ================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -41,13 +67,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();       // <- Session antes dos controllers
+app.UseSession();        // Session ANTES dos controllers
 app.UseAuthorization();
 
-// **Middleware do NToastNotify**
+// NToastNotify
 app.UseNToastNotify();
 
-// Rotas
+// ================================
+// Rotas MVC
+// ================================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Congregacao}/{action=Login}/{id?}");
