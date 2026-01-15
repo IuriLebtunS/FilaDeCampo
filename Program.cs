@@ -1,53 +1,49 @@
 using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ================================
-// MVC + NToastNotify
+// Services
 // ================================
-builder.Services.AddControllersWithViews()
-    .AddNToastNotifyToastr(new ToastrOptions
-    {
-        ProgressBar = true,
-        PositionClass = ToastPositions.TopRight,
-        PreventDuplicates = true,
-        CloseButton = true
-    });
+builder.Services.AddControllersWithViews();
 
 // ================================
-// DbContext
+// Database
 // ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Default")
-        ?? Environment.GetEnvironmentVariable("DATABASE_URL")
-    ));
+{
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+    if (!string.IsNullOrWhiteSpace(databaseUrl))
+    {
+        // PRODUÇÃO (Railway)
+        options.UseNpgsql(
+            databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true"
+        );
+    }
+    else
+    {
+        // DESENVOLVIMENTO (local)
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("Default")
+        );
+    }
+});
 
 // ================================
 // Session
 // ================================
 builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
-// ================================
-// 🚀 CONFIGURAÇÃO OBRIGATÓRIA PARA RAILWAY
-// ================================
-var portVar = Environment.GetEnvironmentVariable("PORT");
-
-if (!string.IsNullOrEmpty(portVar) && int.TryParse(portVar, out int port))
-{
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ListenAnyIP(port);
-    });
-}
 
 // ================================
 // Build
@@ -59,23 +55,29 @@ var app = builder.Build();
 // ================================
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();        // Session ANTES dos controllers
+app.UseSession();
 app.UseAuthorization();
 
 // NToastNotify
 app.UseNToastNotify();
 
 // ================================
-// Rotas MVC
+// MVC Routes
 // ================================
 app.MapControllerRoute(
     name: "default",
