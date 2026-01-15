@@ -20,8 +20,9 @@ builder.Services.AddControllersWithViews()
 // DbContext
 // ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("Default")
+        ?? Environment.GetEnvironmentVariable("DATABASE_URL")
     ));
 
 // ================================
