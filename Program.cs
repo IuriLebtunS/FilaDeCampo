@@ -1,6 +1,8 @@
 using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+using Microsoft.AspNetCore.HttpOverrides;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,19 +39,6 @@ builder.Services.AddSession(options =>
 });
 
 // ================================
-// 🚀 CONFIGURAÇÃO OBRIGATÓRIA PARA RAILWAY
-// ================================
-var portVar = Environment.GetEnvironmentVariable("PORT");
-
-if (!string.IsNullOrEmpty(portVar) && int.TryParse(portVar, out int port))
-{
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ListenAnyIP(port);
-    });
-}
-
-// ================================
 // Build
 // ================================
 var app = builder.Build();
@@ -62,6 +51,11 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
