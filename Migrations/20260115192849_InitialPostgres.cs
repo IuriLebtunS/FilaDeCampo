@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace FilaDeCampo.Migrations
 {
     /// <inheritdoc />
-    public partial class Genesis : Migration
+    public partial class InitialPostgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,11 +16,11 @@ namespace FilaDeCampo.Migrations
                 name: "Congregacoes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChaveAcesso = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Ativa = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "text", nullable: false),
+                    ChaveAcesso = table.Column<string>(type: "text", nullable: false),
+                    Ativa = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,10 +31,10 @@ namespace FilaDeCampo.Migrations
                 name: "Configuracoes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UltimoDirigenteId = table.Column<int>(type: "int", nullable: false),
-                    CongregacaoId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UltimoDirigenteId = table.Column<int>(type: "integer", nullable: false),
+                    CongregacaoId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,12 +51,12 @@ namespace FilaDeCampo.Migrations
                 name: "Dirigentes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrdemRodizio = table.Column<int>(type: "int", nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    CongregacaoId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "text", nullable: false),
+                    OrdemRodizio = table.Column<int>(type: "integer", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    CongregacaoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,12 +72,12 @@ namespace FilaDeCampo.Migrations
                 name: "Escalas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Data = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DirigenteId = table.Column<int>(type: "int", nullable: false),
-                    CongregacaoId = table.Column<int>(type: "int", nullable: false),
-                    Observacao = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Data = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DirigenteId = table.Column<int>(type: "integer", nullable: false),
+                    CongregacaoId = table.Column<int>(type: "integer", nullable: false),
+                    Observacao = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
