@@ -3,19 +3,41 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using Microsoft.AspNetCore.HttpOverrides;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
+// ================================
+// Services
+// ================================
 builder.Services.AddControllersWithViews();
 
+// ================================
+// Database
+// ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseNpgsql(
-        Environment.GetEnvironmentVariable("DATABASE_URL")
-        + ";SSL Mode=Require;Trust Server Certificate=true"
-    )
-);
+{
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
+    if (!string.IsNullOrWhiteSpace(databaseUrl))
+    {
+        // PRODUÇÃO (Railway)
+        options.UseNpgsql(
+            databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true"
+        );
+    }
+    else
+    {
+        // DESENVOLVIMENTO (local)
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("Default")
+        );
+    }
+});
+
+// ================================
+// Session
+// ================================
 builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -38,7 +60,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto
 });
 
 app.UseHttpsRedirection();
@@ -46,14 +70,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();        // Session ANTES dos controllers
+app.UseSession();
 app.UseAuthorization();
 
 // NToastNotify
 app.UseNToastNotify();
 
 // ================================
-// Rotas MVC
+// MVC Routes
 // ================================
 app.MapControllerRoute(
     name: "default",
