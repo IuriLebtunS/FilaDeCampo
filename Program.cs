@@ -6,30 +6,15 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ================================
-// MVC + NToastNotify
-// ================================
-builder.Services.AddControllersWithViews()
-    .AddNToastNotifyToastr(new ToastrOptions
-    {
-        ProgressBar = true,
-        PositionClass = ToastPositions.TopRight,
-        PreventDuplicates = true,
-        CloseButton = true
-    });
+builder.Services.AddControllersWithViews();
 
-// ================================
-// DbContext
-// ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Default")
-        ?? Environment.GetEnvironmentVariable("DATABASE_URL")
-    ));
+        Environment.GetEnvironmentVariable("DATABASE_URL")
+        + ";SSL Mode=Require;Trust Server Certificate=true"
+    )
+);
 
-// ================================
-// Session
-// ================================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
