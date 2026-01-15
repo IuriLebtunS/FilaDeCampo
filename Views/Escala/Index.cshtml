@@ -3,7 +3,7 @@
 @using X.PagedList.Mvc.Core
 
 @{
-    ViewData["Title"] = "Dirigentes dos Sabados";
+    ViewData["Title"] = "Campo dos Sabados";
 }
 
 <div class="d-flex justify-content-between align-items-center">
@@ -12,9 +12,14 @@
         @ViewData["Title"]
     </h2>
 
-    <a asp-action="Criar" class="btn btn-primary rounded-pill">
-        Criar
-    </a>
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Dirigente" asp-action="Index" class="btn btn-secondary rounded-pill me-2">
+            Dirigentes
+        </a>
+        <a asp-action="Criar" class="btn btn-primary rounded-pill">
+            Criar
+        </a>
+    </div>
 </div>
 
 <hr />
@@ -34,8 +39,9 @@ else
                     / @item.Ano
                 </span>
 
-                <a asp-action="Detalhes" asp-route-mes="@item.Mes" asp-route-ano="@item.Ano" class="btn btn-sm btn-outline-primary rounded-pill">
-                   Detalhes
+                <a asp-action="Detalhes" asp-route-mes="@item.Mes" asp-route-ano="@item.Ano"
+                    class="btn btn-sm btn-outline-primary rounded-pill">
+                    Detalhes
                 </a>
             </li>
         }
@@ -44,6 +50,6 @@ else
     <br />
 
     @Html.PagedListPager(Model, page =>
-        Url.Action("Index", new { page })
-    )
+    Url.Action("Index", new { page })
+)
 }
