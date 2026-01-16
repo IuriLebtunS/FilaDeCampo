@@ -5,6 +5,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using NToastNotify;
 using Npgsql;
 
+string ConvertDatabaseUrlToConnectionString(string databaseUrl)
+{
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    return $"Host={uri.Host};Port={uri.Port};Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')};SSL Mode=Require;Trust Server Certificate=true";
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ================================
@@ -29,26 +36,11 @@ builder.Services.AddDbContext<DbSolaresCampo>(options =>
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // Converte URL do Railway para Npgsql Connection String
-        var databaseUri = new Uri(databaseUrl);
-        var userInfo = databaseUri.UserInfo.Split(':');
-
-        var npgsqlConn = new NpgsqlConnectionStringBuilder
-        {
-            Host = databaseUri.Host,
-            Port = databaseUri.Port,
-            Username = userInfo[0],
-            Password = userInfo[1],
-            Database = databaseUri.AbsolutePath.TrimStart('/'),
-            SslMode = SslMode.Require,
-            TrustServerCertificate = true
-        };
-
-        options.UseNpgsql(npgsqlConn.ConnectionString);
+        // Converte a URL do Railway para o formato que Npgsql aceita
+        options.UseNpgsql(ConvertDatabaseUrlToConnectionString(databaseUrl));
     }
     else
     {
-        // Local / Design-time / EF
         options.UseNpgsql(
             builder.Configuration.GetConnectionString("DefaultConnection")
         );
