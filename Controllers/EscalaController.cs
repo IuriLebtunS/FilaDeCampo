@@ -88,10 +88,19 @@ public class EscalaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(int mes, int ano, int quantidadeMeses)
     {
-        if (quantidadeMeses < 1) quantidadeMeses = 1;
-        if (quantidadeMeses > 3) quantidadeMeses = 3;
+        // ================== Validações ==================
+        if (mes < 1 || mes > 12)
+            ModelState.AddModelError("mes", "Mês inválido.");
 
-        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+        if (ano < 2000 || ano > 2100)
+            ModelState.AddModelError("ano", "Ano inválido.");
+
+        if (quantidadeMeses < 1 || quantidadeMeses > 3)
+            ModelState.AddModelError("quantidadeMeses", "A quantidade de meses deve ser entre 1 e 3.");
+
+        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId") ?? 0;
+        if (congregacaoId == 0)
+            ModelState.AddModelError("congregacao", "Congregação não encontrada na sessão.");
 
         var dirigentes = await _dbSolares.Dirigentes
             .Where(d => d.Ativo && d.CongregacaoId == congregacaoId)
@@ -100,8 +109,18 @@ public class EscalaController : Controller
             .ToListAsync();
 
         if (!dirigentes.Any())
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("dirigentes", "Não há dirigentes ativos cadastrados.");
 
+        // Se houver algum erro, retorna para a view
+        if (!ModelState.IsValid)
+        {
+            ViewData["MesAtual"] = mes;
+            ViewData["AnoAtual"] = ano;
+            ViewData["QtdMeses"] = quantidadeMeses;
+            return View();
+        }
+
+        // ================== Criação das escalas ==================
         int dirigenteIndex = 0;
 
         for (int i = 0; i < quantidadeMeses; i++)
@@ -115,18 +134,21 @@ public class EscalaController : Controller
                 anoAtual++;
             }
 
+            // Datas já cadastradas (apenas a data, sem hora)
             var datasExistentes = await _dbSolares.Escalas
-                .Where(e => e.Data.Month == mesAtual && e.Data.Year == anoAtual
-                            && e.Dirigente.CongregacaoId == congregacaoId)
-                .Select(e => e.Data)
+                .Where(e => e.Data.Year == anoAtual &&
+                            e.Data.Month == mesAtual &&
+                            e.CongregacaoId == congregacaoId)
+                .Select(e => e.Data.Date)
                 .ToListAsync();
 
             var data = new DateTime(anoAtual, mesAtual, 1);
 
             while (data.Month == mesAtual)
             {
+                // Só sábado e ainda não cadastrado
                 if (data.DayOfWeek == DayOfWeek.Saturday &&
-                    !datasExistentes.Contains(data))
+                    !datasExistentes.Contains(data.Date))
                 {
                     var dirigente = dirigentes[dirigenteIndex % dirigentes.Count];
 
@@ -134,8 +156,7 @@ public class EscalaController : Controller
                     {
                         Data = data,
                         DirigenteId = dirigente.Id,
-                        CongregacaoId = congregacaoId 
-
+                        CongregacaoId = congregacaoId
                     });
 
                     dirigenteIndex++;
@@ -147,8 +168,10 @@ public class EscalaController : Controller
 
         await _dbSolares.SaveChangesAsync();
 
+        TempData["Success"] = "Escalas criadas com sucesso!";
         return RedirectToAction(nameof(Index));
     }
+
 
     public async Task<IActionResult> Editar(int id)
     {
