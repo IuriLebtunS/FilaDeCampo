@@ -16,7 +16,8 @@ string ConvertDatabaseUrlToConnectionString(string databaseUrl)
 
 
 var builder = WebApplication.CreateBuilder(args);
-var keysPath = Path.Combine("/app", "DataProtection-Keys"); // diretório persistente no Railway
+var keysPath = Path.Combine("/app", "DataProtection-Keys"); // Railway: diretório persistente
+Directory.CreateDirectory(keysPath);
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
