@@ -6,39 +6,32 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ================================
-// Services
-// ================================
+builder.Services.AddControllersWithViews();
+
 builder.Services
     .AddControllersWithViews()
-    .AddNToastNotifyToastr();
+    .AddNToastNotifyToastr(new ToastrOptions
+    {
+        ProgressBar = true,
+        PositionClass = ToastPositions.TopRight,
+        TimeOut = 4000,
+        CloseButton = true
+    });
 
-// ================================
-// Database
-// ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
 {
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // Produção (Railway)
-        options.UseNpgsql(
-            databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true"
-        );
+        options.UseNpgsql(databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true");
     }
     else
     {
-        // Desenvolvimento
-        options.UseNpgsql(
-            builder.Configuration.GetConnectionString("Default")
-        );
+        options.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
     }
 });
 
-// ================================
-// PORT (Railway / PaaS)
-// ================================
 var portVar = Environment.GetEnvironmentVariable("PORT");
 
 if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
@@ -49,9 +42,6 @@ if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
     });
 }
 
-// ================================
-// Authentication
-// ================================
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -62,9 +52,6 @@ builder.Services
         options.SlidingExpiration = true;
     });
 
-// ================================
-// Session
-// ================================
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -74,14 +61,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// ================================
-// Build
-// ================================
 var app = builder.Build();
 
-// ================================
-// Middlewares
-// ================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -94,24 +75,17 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
         ForwardedHeaders.XForwardedProto
 });
 
-// ⚠️ Se estiver atrás de proxy HTTPS (Railway), pode manter
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// 🔑 ORDEM CORRETA
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
-// Toasts
 app.UseNToastNotify();
 
-// ================================
-// MVC Routes
-// ================================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Congregacao}/{action=Login}/{id?}");

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/xyZdM8QWPc=",
+  "dgSpecHash": "KWWF7v756+Y=",
   "success": true,
   "projectFilePath": "C:\\Users\\lebtu\\Documents\\FilaDeCampo\\FilaDeCampo.csproj",
   "expectedPackageFiles": [
@@ -179,5 +179,18 @@
     "C:\\Users\\lebtu\\.nuget\\packages\\x.pagedlist\\10.5.9\\x.pagedlist.10.5.9.nupkg.sha512",
     "C:\\Users\\lebtu\\.nuget\\packages\\x.pagedlist.mvc.core\\10.5.9\\x.pagedlist.mvc.core.10.5.9.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "FilaDeCampo depende de NToastNotify (>= 7.0.5), mas NToastNotify 7.0.5 não foi encontrado. NToastNotify 8.0.0 foi resolvido em vez disso.",
+      "projectPath": "C:\\Users\\lebtu\\Documents\\FilaDeCampo\\FilaDeCampo.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\lebtu\\Documents\\FilaDeCampo\\FilaDeCampo.csproj",
+      "libraryId": "NToastNotify",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

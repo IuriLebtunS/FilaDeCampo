@@ -9079,7 +9079,7 @@
     "net8.0": [
       "ClosedXML >= 0.105.0",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.6",
-      "NToastNotify >= 8.0.0",
+      "NToastNotify >= 7.0.5",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 8.0.4",
       "X.PagedList >= 10.5.9",
       "X.PagedList.Mvc.Core >= 10.5.9"
@@ -9146,7 +9146,7 @@
           },
           "NToastNotify": {
             "target": "Package",
-            "version": "[8.0.0, )"
+            "version": "[7.0.5, )"
           },
           "Npgsql.EntityFrameworkCore.PostgreSQL": {
             "target": "Package",
@@ -9183,5 +9183,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "FilaDeCampo depende de NToastNotify (>= 7.0.5), mas NToastNotify 7.0.5 não foi encontrado. NToastNotify 8.0.0 foi resolvido em vez disso.",
+      "libraryId": "NToastNotify",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }
