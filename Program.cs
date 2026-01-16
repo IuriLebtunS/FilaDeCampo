@@ -1,13 +1,15 @@
 using FilaDeCampo.Data;
+using FilaDeCampo.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using NToastNotify;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
-
+// ================================
+// MVC + Toast
+// ================================
 builder.Services
     .AddControllersWithViews()
     .AddNToastNotifyToastr(new ToastrOptions
@@ -18,20 +20,16 @@ builder.Services
         CloseButton = true
     });
 
+// ================================
+// Database
+// ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-{
-    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    options.UseNpgsql(ConnectionHelper.GetConnectionString(builder.Configuration))
+);
 
-    if (!string.IsNullOrWhiteSpace(databaseUrl))
-    {
-        options.UseNpgsql(databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true");
-    }
-    else
-    {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
-    }
-});
-
+// ================================
+// PORT (Railway)
+// ================================
 var portVar = Environment.GetEnvironmentVariable("PORT");
 
 if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
@@ -42,6 +40,9 @@ if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
     });
 }
 
+// ================================
+// Authentication
+// ================================
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -52,6 +53,9 @@ builder.Services
         options.SlidingExpiration = true;
     });
 
+// ================================
+// Session
+// ================================
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -63,6 +67,9 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// ================================
+// Middlewares
+// ================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -80,12 +87,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.UseNToastNotify();
 
+// ================================
+// Routes
+// ================================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Congregacao}/{action=Login}/{id?}");
