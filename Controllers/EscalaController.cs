@@ -85,7 +85,7 @@ public class EscalaController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Criar(int mes, int ano, int quantidadeMeses)
     {
         // ================== Validações ==================
