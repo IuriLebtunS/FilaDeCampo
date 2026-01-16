@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using NToastNotify;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,22 @@ builder.Services.AddDbContext<DbSolaresCampo>(options =>
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // Railway
-        options.UseNpgsql(databaseUrl);
+        // Converte URL do Railway para Npgsql Connection String
+        var databaseUri = new Uri(databaseUrl);
+        var userInfo = databaseUri.UserInfo.Split(':');
+
+        var npgsqlConn = new NpgsqlConnectionStringBuilder
+        {
+            Host = databaseUri.Host,
+            Port = databaseUri.Port,
+            Username = userInfo[0],
+            Password = userInfo[1],
+            Database = databaseUri.AbsolutePath.TrimStart('/'),
+            SslMode = SslMode.Require,
+            TrustServerCertificate = true
+        };
+
+        options.UseNpgsql(npgsqlConn.ConnectionString);
     }
     else
     {
@@ -89,12 +104,10 @@ app.UseNToastNotify();
 // ================================
 // Automatic EF Core Migrations
 // ================================
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>();
-    db.Database.Migrate(); // Cria todas as tabelas que ainda não existem
+using (var scope = app.Services.CreateScope()) 
+{ 
+    var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>(); db.Database.Migrate(); 
 }
-
 // ================================
 // Routes
 // ================================
