@@ -1,4 +1,6 @@
 using FilaDeCampo.Data;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,7 +14,13 @@ string ConvertDatabaseUrlToConnectionString(string databaseUrl)
     return $"Host={uri.Host};Port={uri.Port};Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')};SSL Mode=Require;Trust Server Certificate=true";
 }
 
+
 var builder = WebApplication.CreateBuilder(args);
+var keysPath = Path.Combine("/app", "DataProtection-Keys"); // diretório persistente no Railway
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+    .SetApplicationName("FilaDeCampo");
 
 // ================================
 // MVC + Toast
