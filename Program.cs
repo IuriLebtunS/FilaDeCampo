@@ -2,13 +2,16 @@ using FilaDeCampo.Data;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ================================
 // Services
 // ================================
-builder.Services.AddControllersWithViews();
+builder.Services
+    .AddControllersWithViews()
+    .AddNToastNotifyToastr();
 
 // ================================
 // Database
@@ -19,29 +22,45 @@ builder.Services.AddDbContext<DbSolaresCampo>(options =>
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // PRODUÇÃO (Railway)
+        // Produção (Railway)
         options.UseNpgsql(
             databaseUrl + ";SSL Mode=Require;Trust Server Certificate=true"
         );
     }
     else
     {
-        // DESENVOLVIMENTO (local)
+        // Desenvolvimento
         options.UseNpgsql(
             builder.Configuration.GetConnectionString("Default")
         );
     }
 });
 
+// ================================
+// PORT (Railway / PaaS)
+// ================================
 var portVar = Environment.GetEnvironmentVariable("PORT");
 
-if (portVar is { Length: > 0 } && int.TryParse(portVar, out int port))
+if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
         options.ListenAnyIP(port);
     });
 }
+
+// ================================
+// Authentication
+// ================================
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Congregacao/Login";
+        options.AccessDeniedPath = "/Home/AcessoNegado";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+    });
 
 // ================================
 // Session
@@ -75,15 +94,19 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
         ForwardedHeaders.XForwardedProto
 });
 
+// ⚠️ Se estiver atrás de proxy HTTPS (Railway), pode manter
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
+// 🔑 ORDEM CORRETA
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
-// NToastNotify
+// Toasts
 app.UseNToastNotify();
 
 // ================================
