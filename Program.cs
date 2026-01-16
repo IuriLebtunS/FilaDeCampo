@@ -104,20 +104,10 @@ app.UseNToastNotify();
 // ================================
 // Automatic EF Core Migrations
 // ================================
-try
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>();
-        db.Database.Migrate(); // Cria todas as tabelas que ainda não existem
-    }
+using (var scope = app.Services.CreateScope()) 
+{ 
+    var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>(); db.Database.Migrate(); 
 }
-catch (Exception ex)
-{
-    Console.WriteLine("Erro ao aplicar migrations automaticamente: " + ex.Message);
-    // Não explode a aplicação — você verá o erro no log
-}
-
 // ================================
 // Routes
 // ================================
