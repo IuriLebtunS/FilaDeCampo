@@ -87,6 +87,15 @@ app.UseAuthorization();
 app.UseNToastNotify();
 
 // ================================
+// Automatic EF Core Migrations
+// ================================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>();
+    db.Database.Migrate(); // Cria todas as tabelas que ainda não existem
+}
+
+// ================================
 // Routes
 // ================================
 app.MapControllerRoute(
