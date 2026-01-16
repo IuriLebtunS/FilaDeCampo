@@ -1,5 +1,4 @@
 using FilaDeCampo.Data;
-using FilaDeCampo.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,24 +20,25 @@ builder.Services
     });
 
 // ================================
-// Database
+// Database (Railway)
 // ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
-    options.UseNpgsql(ConnectionHelper.GetConnectionString(builder.Configuration))
-);
-
-// ================================
-// PORT (Railway)
-// ================================
-var portVar = Environment.GetEnvironmentVariable("PORT");
-
-if (!string.IsNullOrWhiteSpace(portVar) && int.TryParse(portVar, out int port))
 {
-    builder.WebHost.ConfigureKestrel(options =>
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+    if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        options.ListenAnyIP(port);
-    });
-}
+        // Railway
+        options.UseNpgsql(databaseUrl);
+    }
+    else
+    {
+        // Local / Design-time / EF
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        );
+    }
+});
 
 // ================================
 // Authentication
@@ -70,11 +70,6 @@ var app = builder.Build();
 // ================================
 // Middlewares
 // ================================
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-}
-
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders =
@@ -82,9 +77,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
         ForwardedHeaders.XForwardedProto
 });
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseSession();
