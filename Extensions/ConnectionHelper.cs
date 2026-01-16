@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace FilaDeCampo.Extensions
 {
@@ -11,18 +11,24 @@ namespace FilaDeCampo.Extensions
             if (!string.IsNullOrWhiteSpace(databaseUrl))
             {
                 var uri = new Uri(databaseUrl);
-                var userInfo = uri.UserInfo.Split(':', 2);
+                var userInfo = uri.UserInfo.Split(':');
 
-                return
-                    $"Host={uri.Host};" +
-                    $"Port={uri.Port};" +
-                    $"Database={uri.AbsolutePath.TrimStart('/')};" +
-                    $"Username={userInfo[0]};" +
-                    $"Password={userInfo[1]};" +
-                    $"Ssl Mode=Require;Trust Server Certificate=true";
+                var builder = new NpgsqlConnectionStringBuilder
+                {
+                    Host = uri.Host,
+                    Port = uri.Port,
+                    Username = userInfo[0],
+                    Password = userInfo[1],
+                    Database = uri.AbsolutePath.TrimStart('/'),
+                    SslMode = SslMode.Require,
+                    TrustServerCertificate = true
+                };
+
+                return builder.ConnectionString;
             }
 
-            return configuration.GetConnectionString("Default");
+            // fallback local (appsettings.json)
+            return configuration.GetConnectionString("DefaultConnection");
         }
     }
 }
