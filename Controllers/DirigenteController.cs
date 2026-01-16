@@ -34,7 +34,6 @@ public class DirigenteController : Controller
     public IActionResult Criar() => View();
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(Dirigente dirigente)
     {
         if (!ModelState.IsValid)
@@ -77,7 +76,6 @@ public class DirigenteController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(Dirigente dirigente)
     {
         if (!ModelState.IsValid)

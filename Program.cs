@@ -1,6 +1,4 @@
 using FilaDeCampo.Data;
-using Microsoft.AspNetCore.DataProtection;
-using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,14 +13,8 @@ string ConvertDatabaseUrlToConnectionString(string databaseUrl)
 }
 
 
+
 var builder = WebApplication.CreateBuilder(args);
-
-var keysPath = Path.Combine("/tmp", "DataProtection-Keys");
-Directory.CreateDirectory(keysPath);
-
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-    .SetApplicationName("FilaDeCampo");
 
 // ================================
 // MVC + Toast

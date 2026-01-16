@@ -39,7 +39,6 @@ public class CongregacaoController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginCongreVM model)
     {
         model.Congregacoes = await _db.Congregacoes
@@ -76,7 +75,6 @@ public class CongregacaoController : Controller
     public IActionResult LoginMaster() => View();
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public IActionResult LoginMaster(string usuario, string senha)
     {
         if (!string.IsNullOrWhiteSpace(usuario) &&
@@ -103,7 +101,6 @@ public class CongregacaoController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
@@ -120,7 +117,6 @@ public class CongregacaoController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(CriarCongreVM model)
     {
         if (HttpContext.Session.GetString("Perfil") != "Master")

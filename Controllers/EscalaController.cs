@@ -85,7 +85,6 @@ public class EscalaController : Controller
     }
 
     [HttpPost]
-    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Criar(int mes, int ano, int quantidadeMeses)
     {
         // ================== Validações ==================
@@ -205,7 +204,6 @@ public class EscalaController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(EditarEscalaVM model)
     {
         int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
