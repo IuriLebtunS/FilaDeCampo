@@ -1,5 +1,9 @@
+using System.Security.Claims;
 using FilaDeCampo.Data;
 using FilaDeCampo.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +23,11 @@ public class CongregacaoController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Login()
     {
-        // Limpa sessão ao acessar login
+        // Limpa sessão e cookie ao entrar no login
+        await HttpContext.SignOutAsync();
         HttpContext.Session.Clear();
 
         var vm = new LoginCongreVM
@@ -35,10 +41,12 @@ public class CongregacaoController : Controller
                 })
                 .ToListAsync()
         };
+
         return View(vm);
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginCongreVM model)
     {
         model.Congregacoes = await _db.Congregacoes
@@ -50,13 +58,15 @@ public class CongregacaoController : Controller
             })
             .ToListAsync();
 
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid)
+            return View(model);
 
         var congregacao = await _db.Congregacoes
+            .AsNoTracking()
             .FirstOrDefaultAsync(c =>
                 c.Id == model.CongregacaoId &&
-                c.ChaveAcesso.Trim().ToLower() == model.ChaveAcesso.Trim().ToLower() &&
-                c.Ativa);
+                c.Ativa &&
+                c.ChaveAcesso.ToLower() == model.ChaveAcesso.Trim().ToLower());
 
         if (congregacao == null)
         {
@@ -64,17 +74,32 @@ public class CongregacaoController : Controller
             return View(model);
         }
 
-        HttpContext.Session.SetInt32("CongregacaoId", congregacao.Id);
-        HttpContext.Session.SetString("CongregacaoNome", congregacao.Nome);
-        HttpContext.Session.SetString("Perfil", "Congregacao");
+        var claims = new List<Claim>
+        {
+            new("CongregacaoId", congregacao.Id.ToString()),
+            new Claim(ClaimTypes.Name, congregacao.Nome),
+            new Claim(ClaimTypes.Role, "Congregacao")
+        };
+
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme
+        );
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity)
+        );
 
         return RedirectToAction("Index", "Escala");
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult LoginMaster() => View();
 
     [HttpPost]
+    [AllowAnonymous]
     public IActionResult LoginMaster(string usuario, string senha)
     {
         if (!string.IsNullOrWhiteSpace(usuario) &&

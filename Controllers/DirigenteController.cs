@@ -1,27 +1,27 @@
 using Microsoft.EntityFrameworkCore;
+using FilaDeCampo.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using FilaDeCampo.Models;
 using FilaDeCampo.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FilaDeCampo.Controllers;
 
+[Authorize(Roles = "Congregacao")]
 public class DirigenteController : Controller
 {
-    private readonly DbSolaresCampo _dbSolares;
+    private readonly DbSolaresCampo _db;
 
-    public DirigenteController(DbSolaresCampo dbSolares)
+    public DirigenteController(DbSolaresCampo db)
     {
-        _dbSolares = dbSolares;
+        _db = db;
     }
 
-    // ================= INDEX =================
     public async Task<IActionResult> Index()
     {
-        // Pega a congregação logada
-        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+        int congregacaoId = User.GetCongregacaoId();
 
-        // Lista só os dirigentes da congregação, ordenados pelo rodízio
-        var dirigentes = await _dbSolares.Dirigentes
+        var dirigentes = await _db.Dirigentes
             .AsNoTracking()
             .Where(d => d.CongregacaoId == congregacaoId)
             .OrderBy(d => d.OrdemRodizio)
@@ -30,7 +30,6 @@ public class DirigenteController : Controller
         return View(dirigentes);
     }
 
-    // ================= CRIAR =================
     public IActionResult Criar() => View();
 
     [HttpPost]
@@ -39,35 +38,31 @@ public class DirigenteController : Controller
         if (!ModelState.IsValid)
             return View(dirigente);
 
-        // Pega a congregação logada
-        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+        int congregacaoId = User.GetCongregacaoId();
 
-        // Define a congregação do dirigente
         dirigente.CongregacaoId = congregacaoId;
 
-        // Calcula a próxima ordem de rodízio
-        int ultimo = await _dbSolares.Dirigentes
-            .AsNoTracking()
+        int ultimo = await _db.Dirigentes
             .Where(d => d.CongregacaoId == congregacaoId)
             .MaxAsync(d => (int?)d.OrdemRodizio) ?? 0;
 
         dirigente.OrdemRodizio = ultimo + 1;
         dirigente.Ativo = true;
 
-        _dbSolares.Dirigentes.Add(dirigente);
-        await _dbSolares.SaveChangesAsync();
+        _db.Dirigentes.Add(dirigente);
+        await _db.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }
 
-    // ================= EDITAR =================
     public async Task<IActionResult> Editar(int id)
     {
-        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+        int congregacaoId = User.GetCongregacaoId();
 
-        var dirigente = await _dbSolares.Dirigentes
-            .Where(d => d.CongregacaoId == congregacaoId)
-            .FirstOrDefaultAsync(d => d.Id == id);
+        var dirigente = await _db.Dirigentes
+            .FirstOrDefaultAsync(d =>
+                d.Id == id &&
+                d.CongregacaoId == congregacaoId);
 
         if (dirigente == null)
             return NotFound();
@@ -81,12 +76,12 @@ public class DirigenteController : Controller
         if (!ModelState.IsValid)
             return View(dirigente);
 
-        // Garante que só edita dirigentes da congregação logada
-        int congregacaoId = HttpContext.Session.GetInt32("CongregacaoId")!.Value;
+        int congregacaoId = User.GetCongregacaoId();
+
         dirigente.CongregacaoId = congregacaoId;
 
-        _dbSolares.Update(dirigente);
-        await _dbSolares.SaveChangesAsync();
+        _db.Dirigentes.Update(dirigente);
+        await _db.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }
