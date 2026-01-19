@@ -9,10 +9,18 @@ string ConvertDatabaseUrlToConnectionString(string databaseUrl)
 {
     var uri = new Uri(databaseUrl);
     var userInfo = uri.UserInfo.Split(':');
-    return $"Host={uri.Host};Port={uri.Port};Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')};SSL Mode=Require;Trust Server Certificate=true";
+
+    return new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.Port,
+        Username = userInfo[0],
+        Password = userInfo[1],
+        Database = uri.AbsolutePath.TrimStart('/'),
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
+    }.ToString();
 }
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +38,7 @@ builder.Services
     });
 
 // ================================
-// Database (Railway)
+// Database (Railway / Local)
 // ================================
 builder.Services.AddDbContext<DbSolaresCampo>(options =>
 {
@@ -38,12 +46,13 @@ builder.Services.AddDbContext<DbSolaresCampo>(options =>
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // Converte a URL do Railway para o formato que Npgsql aceita
+        // PRODUÇÃO → Railway → PostgreSQL
         options.UseNpgsql(ConvertDatabaseUrlToConnectionString(databaseUrl));
     }
     else
     {
-        options.UseNpgsql(
+        // LOCAL → SQL Server
+        options.UseSqlServer(
             builder.Configuration.GetConnectionString("DefaultConnection")
         );
     }
@@ -63,7 +72,7 @@ builder.Services
     });
 
 // ================================
-// Session
+// Session (opcional, legado)
 // ================================
 builder.Services.AddDistributedMemoryCache();
 
@@ -74,6 +83,11 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddScoped<ValidateCongregacaoFilter>();
+
+// ================================
+// Build app
+// ================================
 var app = builder.Build();
 
 // ================================
@@ -86,22 +100,36 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
         ForwardedHeaders.XForwardedProto
 });
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseSession();
+app.UseSession();        // pode remover futuramente
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseNToastNotify();
 
 // ================================
-// Automatic EF Core Migrations
+// EF Core Migrations (seguro)
 // ================================
-using (var scope = app.Services.CreateScope()) 
-{ 
-    var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>(); db.Database.Migrate(); 
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<DbSolaresCampo>();
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Migration error: {ex.Message}");
+    }
 }
+
 // ================================
 // Routes
 // ================================
