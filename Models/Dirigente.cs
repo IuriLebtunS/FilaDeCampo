@@ -5,6 +5,6 @@ public class Dirigente
     public string Nome { get; set; } = null!;
     public int OrdemRodizio { get; set; }
     public bool Ativo { get; set; } = true;
-    public int? CongregacaoId { get; set; } 
+    public int CongregacaoId { get; set; } 
     public Congregacao? Congregacao { get; set; } 
 }

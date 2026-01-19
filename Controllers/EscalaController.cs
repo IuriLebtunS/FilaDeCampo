@@ -155,7 +155,7 @@ public class EscalaController : Controller
                 {
                     Data = data,
                     DirigenteId = dirigente.Id,
-                    CongregacaoId = congregacaoId
+                    CongregacaoId = dirigente.CongregacaoId // 🔥 NÃO use o User aqui
                 });
 
                 dirigenteIndex++;
