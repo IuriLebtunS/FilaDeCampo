@@ -153,7 +153,7 @@ public class EscalaController : Controller
 
                 _dbSolares.Escalas.Add(new EscalaDeSabado
                 {
-                    Data = data,
+                    Data = DateTime.SpecifyKind(data, DateTimeKind.Utc),
                     DirigenteId = dirigente.Id,
                     CongregacaoId = dirigente.CongregacaoId // 🔥 NÃO use o User aqui
                 });
@@ -233,9 +233,9 @@ public class EscalaController : Controller
         quantidadeMeses = Math.Clamp(quantidadeMeses, 1, 3);
         int congregacaoId = User.GetCongregacaoId();
 
-        var dataInicio = new DateTime(anoInicial, mesInicial, 1);
+        var dataInicio = new DateTime(anoInicial, mesInicial, 1, 0, 0, 0, DateTimeKind.Utc);
         var dataFim = dataInicio.AddMonths(quantidadeMeses).AddDays(-1);
-
+        
         var escalas = await _dbSolares.Escalas
             .AsNoTracking()
             .Include(e => e.Dirigente)

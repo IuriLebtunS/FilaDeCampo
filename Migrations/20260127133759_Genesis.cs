@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FilaDeCampo.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPostgres : Migration
+    public partial class Genesis : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,7 +56,7 @@ namespace FilaDeCampo.Migrations
                     Nome = table.Column<string>(type: "text", nullable: false),
                     OrdemRodizio = table.Column<int>(type: "integer", nullable: false),
                     Ativo = table.Column<bool>(type: "boolean", nullable: false),
-                    CongregacaoId = table.Column<int>(type: "integer", nullable: true)
+                    CongregacaoId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,7 +65,8 @@ namespace FilaDeCampo.Migrations
                         name: "FK_Dirigentes_Congregacoes_CongregacaoId",
                         column: x => x.CongregacaoId,
                         principalTable: "Congregacoes",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

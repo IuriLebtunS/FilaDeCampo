@@ -46,18 +46,17 @@ builder.Services.AddDbContext<DbSolaresCampo>(options =>
 
     if (!string.IsNullOrWhiteSpace(databaseUrl))
     {
-        // PRODUÇÃO → Railway → PostgreSQL
+        // PRODUÇÃO → Railway
         options.UseNpgsql(ConvertDatabaseUrlToConnectionString(databaseUrl));
     }
     else
     {
-        // LOCAL → SQL Server
-        options.UseSqlServer(
+        // LOCAL → PostgreSQL
+        options.UseNpgsql(
             builder.Configuration.GetConnectionString("DefaultConnection")
         );
     }
 });
-
 // ================================
 // Authentication
 // ================================
