@@ -24,7 +24,6 @@ public class EscalaController : Controller
         _dbSolares = dbSolares;
     }
 
-    // ================= INDEX =================
     [Authorize]
     public async Task<IActionResult> Index(int page = 1)
     {
@@ -47,7 +46,6 @@ public class EscalaController : Controller
         return View(meses.ToPagedList(page, pageSize));
     }
 
-    // ================= DETALHES =================
     public async Task<IActionResult> Detalhes(int mes, int ano)
     {
         int congregacaoId = User.GetCongregacaoId();
@@ -155,7 +153,7 @@ public class EscalaController : Controller
                 {
                     Data = DateTime.SpecifyKind(data, DateTimeKind.Utc),
                     DirigenteId = dirigente.Id,
-                    CongregacaoId = dirigente.CongregacaoId // 🔥 NÃO use o User aqui
+                    CongregacaoId = dirigente.CongregacaoId 
                 });
 
                 dirigenteIndex++;
