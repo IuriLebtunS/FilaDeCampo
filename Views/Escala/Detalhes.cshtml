@@ -13,13 +13,8 @@
 
     <div class="ms-auto d-flex gap-2">
 
-        <a asp-action="Index" class="btn btn-secondary rounded-pill">
-            <i class="fa-solid fa-arrow-left me-1"></i>
-            Voltar
-        </a>
-
         <a asp-action="ExportarExcelPeriodo" asp-route-mesInicial="@Model.Mes" asp-route-anoInicial="@Model.Ano"
-            asp-route-quantidadeMeses="3" class="btn btn-outline-success rounded-pill">
+               asp-route-quantidadeMeses="3" class="btn btn-outline-success rounded-pill">
             <i class="fa-solid fa-file-excel me-1"></i>
             Excel
         </a>
@@ -51,7 +46,7 @@
                 </div>
 
                 <a asp-controller="Escala" asp-action="Editar" asp-route-id="@item.Id"
-                    class="badge bg-primary fs-6 text-decoration-none rounded-pill">
+                       class="badge bg-primary fs-6 text-decoration-none rounded-pill">
                     <i class="fa-solid fa-user-tie me-1"></i>
                     @item.Dirigente
                 </a>
@@ -61,4 +56,13 @@
 
     </div>
 
+
+</div>
+<br />
+
+<div class="text-end">
+    <a asp-action="Index" class="btn btn-secondary rounded-pill">
+        <i class="fa-solid fa-arrow-left me-1"></i>
+        Voltar
+    </a>
 </div>
