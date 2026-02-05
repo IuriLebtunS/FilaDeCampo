@@ -1,7 +1,9 @@
-using FilaDeCampo.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using FilaDeCampo.Data;
 using NToastNotify;
 using Npgsql;
 
@@ -88,6 +90,19 @@ builder.Services.AddScoped<ValidateCongregacaoFilter>();
 // Build app
 // ================================
 var app = builder.Build();
+
+var ptBr = new CultureInfo("pt-BR");
+var esLatam = new CultureInfo("es-419"); // Espanhol América Latina
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(ptBr),
+    SupportedCultures = new[] { ptBr, esLatam },
+    SupportedUICultures = new[] { ptBr, esLatam }
+};
+
+// NÃO adiciona en-US em nenhum lugar
+app.UseRequestLocalization(localizationOptions);
 
 // ================================
 // Middlewares
