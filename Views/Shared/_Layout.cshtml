@@ -27,20 +27,22 @@
 <body>
     @{
         var estaLogado = User.Identity?.IsAuthenticated == true;
-        var perfil = estaLogado ? User.FindFirst("Perfil")?.Value : null;
-        var nomeUsuario = estaLogado ? Context.Session.GetString("NomeUsuario") : "";
 
+        var perfil = estaLogado ? User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value : null;
+
+        var nomeUsuario = estaLogado ? Context.Session.GetString("NomeUsuario") : "";
     }
 
     <!-- ===================== NAVBAR ===================== -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
             <div class="container-fluid">
-                <!-- LOGO / TÍTULO SEMPRE VISÍVEL -->
-                <a class="navbar-brand" asp-area="" asp-controller="Congregacao" asp-action="Login">
-                    ConReg
-                </a>
-
+                <form method="post" asp-controller="Congregacao" asp-action="Logout" class="d-inline">
+                    <button type="submit" class="btn btn-link navbar-brand p-0"
+                            style="color:white; text-decoration:none;">
+                        CONREG
+                    </button>
+                </form>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -70,7 +72,26 @@
                             else if (perfil?.Equals("Congregacao", StringComparison.OrdinalIgnoreCase) == true)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">Campo Sabados</a>
+                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">
+                                        Campo Sabados
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="" asp-action="">
+                                        Indicadores
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">
+                                        Audio e Vídeo
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">
+                                        Microfone Volante
+                                    </a>
                                 </li>
                             }
                         }
@@ -102,7 +123,7 @@
     <!-- ===================== FOOTER ===================== -->
     <footer class="border-top footer text-muted mt-5">
         <div class="container d-flex justify-content-between py-2">
-            <span>&copy; 2025 - FilaDeCampo</span>
+            <span>&copy; 2025 - ConReg</span>
             <span><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> | v1.0</span>
         </div>
     </footer>
