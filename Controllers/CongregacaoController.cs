@@ -147,20 +147,16 @@ public class CongregacaoController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Master")]
     public IActionResult Criar()
     {
-        if (HttpContext.Session.GetString("Perfil") != "Master")
-            return Forbid();
-
         return View(new CriarCongreVM());
     }
 
     [HttpPost]
+    [Authorize(Roles = "Master")]
     public async Task<IActionResult> Criar(CriarCongreVM model)
     {
-        if (HttpContext.Session.GetString("Perfil") != "Master")
-            return Forbid();
-
         if (!ModelState.IsValid)
             return View(model);
 
