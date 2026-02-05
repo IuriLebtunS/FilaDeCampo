@@ -100,14 +100,27 @@ public class CongregacaoController : Controller
 
     [HttpPost]
     [AllowAnonymous]
-    public IActionResult LoginMaster(string usuario, string senha)
+    public async Task<IActionResult> LoginMaster(string usuario, string senha)
     {
-        if (!string.IsNullOrWhiteSpace(usuario) &&
-            usuario.Equals(MasterEmail, StringComparison.OrdinalIgnoreCase) &&
-            senha == MasterSenha)
+        if (usuario.Equals(MasterEmail, StringComparison.OrdinalIgnoreCase)
+            && senha == MasterSenha)
         {
-            HttpContext.Session.SetString("Perfil", "Master");
-            HttpContext.Session.SetString("NomeUsuario", "Iuri");
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "Iuri"),
+                new Claim(ClaimTypes.Role, "Master")
+            };
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity)
+            );
+
             return RedirectToAction("DashboardMaster");
         }
 
@@ -115,21 +128,22 @@ public class CongregacaoController : Controller
         return View();
     }
 
-    [HttpGet]
+    [Authorize(Roles = "Master")]
     public IActionResult DashboardMaster()
     {
-        if (HttpContext.Session.GetString("Perfil") != "Master")
-            return Forbid();
-
-        ViewData["NomeUsuario"] = HttpContext.Session.GetString("NomeUsuario") ?? "Master";
         return View();
     }
 
+
     [HttpPost]
-    public IActionResult Logout()
+    [Authorize]
+    public async Task<IActionResult> Logout()
     {
-        HttpContext.Session.Clear();
-        return RedirectToAction("Login", "Congregacao");
+        await HttpContext.SignOutAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme
+        );
+
+        return RedirectToAction("Login");
     }
 
     [HttpGet]
@@ -150,7 +164,6 @@ public class CongregacaoController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        // Verifica duplicidade
         if (await _db.Congregacoes.AnyAsync(c => c.Nome == model.Nome))
         {
             ModelState.AddModelError("", "Já existe uma congregação com este nome.");
@@ -163,7 +176,6 @@ public class CongregacaoController : Controller
             return View(model);
         }
 
-        // Cria a congregação **vazia**, sem copiar dados de outra
         var congregacao = new FilaDeCampo.Models.Congregacao
         {
             Nome = model.Nome,
@@ -174,11 +186,9 @@ public class CongregacaoController : Controller
         _db.Congregacoes.Add(congregacao);
         await _db.SaveChangesAsync();
 
-        // Mensagem de sucesso
         _notification.AddSuccessToastMessage($"Congregação '{model.Nome}' criada com sucesso!");
 
 
-        // Redireciona para login da congregação (vazio)
         return RedirectToAction("Login", "Congregacao");
     }
 }
