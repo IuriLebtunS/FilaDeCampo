@@ -6,17 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] -ConReg</title>
-    <!-- Bootstrap Bootswatch Pulse -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.8/pulse/bootstrap.min.css" />
 
-    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.8/pulse/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
           crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FilaDeCampo.styles.css" asp-append-version="true" />
-    @* Condicional: só renderiza se a View definir Styles *@
+
     @if (IsSectionDefined("Styles"))
     {
         @RenderSection("Styles", required: false)
@@ -27,13 +24,10 @@
 <body>
     @{
         var estaLogado = User.Identity?.IsAuthenticated == true;
-
         var perfil = estaLogado ? User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value : null;
-
         var nomeUsuario = estaLogado ? Context.Session.GetString("NomeUsuario") : "";
     }
 
-    <!-- ===================== NAVBAR ===================== -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
             <div class="container-fluid">
@@ -50,7 +44,6 @@
 
                 <div class="collapse navbar-collapse" id="navbarCollapse">
 
-                    <!-- MENUS SÓ SE ESTIVER LOGADO -->
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
                         @if (estaLogado)
                         {
@@ -68,7 +61,7 @@
                                     </a>
                                 </li>
                             }
-                            @* Abas da Congregação *@
+                            @*Sessao para as Congregacoes*@
                             else if (perfil?.Equals("Congregacao", StringComparison.OrdinalIgnoreCase) == true)
                             {
                                 <li class="nav-item">
@@ -76,34 +69,35 @@
                                         Campo Sabados
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                               @* <li class="nav-item">
                                     <a class="nav-link text-white" asp-controller="" asp-action="">
                                         Indicadores
                                     </a>
-                                </li>
+                                </li>*@
 
                                 <li class="nav-item">
-                                    <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">
+                                    <a class="nav-link text-white" asp-controller="" asp-action="">
                                         Audio e Vídeo
                                     </a>
                                 </li>
 
-                                <li class="nav-item">
+                                @*<li class="nav-item">
                                     <a class="nav-link text-white" asp-controller="Escala" asp-action="Index">
                                         Microfone Volante
                                     </a>
-                                </li>
+                                </li>*@
                             }
                         }
                     </ul>
 
-                    <!-- USUÁRIO E LOGOUT SÓ SE ESTIVER LOGADO -->
                     @if (estaLogado)
                     {
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
                                 <form method="post" asp-controller="Congregacao" asp-action="Logout" class="d-flex">
-                                    <button type="submit" class="btn btn-outline-light btn-sm rounded-pill">Sair</button>
+                                    <button type="submit" class="btn btn-outline-light btn-sm rounded-pill">
+                                        Sair
+                                    </button>
                                 </form>
                             </li>
                         </ul>
@@ -113,14 +107,12 @@
         </nav>
     </header>
 
-    <!-- ===================== BODY ===================== -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <!-- ===================== FOOTER ===================== -->
     <footer class="border-top footer text-muted mt-5">
         <div class="container d-flex justify-content-between py-2">
             <span>&copy; 2025 - ConReg</span>
@@ -128,7 +120,6 @@
         </div>
     </footer>
 
-    <!-- ===================== SCRIPTS ===================== -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

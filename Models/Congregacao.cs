@@ -7,5 +7,7 @@ namespace FilaDeCampo.Models
         public string ChaveAcesso { get; set; } = null!;
         public bool Ativa { get; set; } = true;
         public List<Dirigente> Dirigentes { get; set; } = new();
+        public List<TecnicoAudioVideo> TecnicosAudioVideo { get; set; } = new();
+
     }
 }
