@@ -11,7 +11,7 @@
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -26,10 +26,14 @@
 
 <body>
     @{
-        var estaLogado = !string.IsNullOrEmpty(Context.Session.GetString("Perfil"));
-        var perfil = estaLogado ? Context.Session.GetString("Perfil") : null;
+        var estaLogado = User.Identity?.IsAuthenticated == true;
+        var perfil = estaLogado ? User.FindFirst("Perfil")?.Value : null;
         var nomeUsuario = estaLogado ? Context.Session.GetString("NomeUsuario") : "";
 
+    }
+
+    @{
+       
     }
 
     <!-- ===================== NAVBAR ===================== -->
@@ -42,7 +46,7 @@
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
